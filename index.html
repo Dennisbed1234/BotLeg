@@ -24,6 +24,13 @@
         .split('Meme Coins').join('Markets');
     }
 
+    function forceChartReady() {
+      try {
+        if (typeof resize === 'function') resize();
+        if (typeof drawChart === 'function') drawChart();
+      } catch (e) {}
+    }
+
     Promise.all([
       fetch(base + 'index.html').then(function (r) {
         if (!r.ok) throw new Error('HTML ' + r.status);
@@ -38,23 +45,40 @@
         var html = brand(pair[0]);
         var js = brand(pair[1]);
 
-        // Remove the original <script src="app.js"> so we inject our copy
-        html = html.replace(/<script\s+src=["']app\.js["']\s*><\/script>/i, '');
+        // Drop remote app.js tag — we inject the script ourselves
+        html = html.replace(/<script\s+src=["']app\.js["']\s*><\/script>/gi, '');
 
         document.open();
         document.write(html);
         document.close();
 
-        // Run app logic after DOM from document.write is ready
+        // Inject app logic
         var s = document.createElement('script');
         s.text = js;
         document.body.appendChild(s);
+
+        // Canvas often measures 0x0 right after document.write — retry layout
+        forceChartReady();
+        requestAnimationFrame(function () {
+          forceChartReady();
+          setTimeout(forceChartReady, 50);
+          setTimeout(forceChartReady, 200);
+          setTimeout(forceChartReady, 500);
+          setTimeout(forceChartReady, 1000);
+        });
+        window.addEventListener('resize', forceChartReady);
+        window.addEventListener('orientationchange', function () {
+          setTimeout(forceChartReady, 100);
+        });
       })
       .catch(function (e) {
-        document.getElementById('boot').innerHTML =
-          '<span style="color:#ff5252">Could not load TradeClaw.</span><br><br>' +
-          (e.message || e) +
-          '<br><br>Hard-refresh, or restore index.html + app.js from commit 13c5b729 on GitHub.';
+        var el = document.getElementById('boot');
+        if (el) {
+          el.innerHTML =
+            '<span style="color:#ff5252">Could not load TradeClaw.</span><br><br>' +
+            (e.message || e) +
+            '<br><br>Hard-refresh, or restore index.html + app.js from commit 13c5b729 on GitHub.';
+        }
       });
   })();
   </script>
