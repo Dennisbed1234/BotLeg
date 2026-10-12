@@ -1,63 +1,62 @@
 <!DOCTYPE html>
-<html lang="en"><head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-<title>TradeClaw — AI Meme Trading</title>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>TradeClaw — AI Meme Trading</title>
+  <style>
+    body { margin: 0; background: #0a0a0f; color: #888; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    #boot { text-align: center; margin-top: 40vh; font-size: 15px; }
+    #boot b { color: #00e676; }
+  </style>
 </head>
-<body style="margin:0;background:#0a0a0f;color:#888;font-family:sans-serif">
-<div style="text-align:center;margin-top:40vh">Loading <b style="color:#00e676">TradeClaw</b>…</div>
-<script src="h0.js"></script>
-<script src="h1.js"></script>
-<script src="h2.js"></script>
-<script src="h3.js"></script>
-<script src="h4.js"></script>
-<script src="h5.js"></script>
-<script src="h6.js"></script>
-<script src="h7.js"></script>
-<script src="h8.js"></script>
-<script src="h9.js"></script>
-<script src="h10.js"></script>
-<script src="h11.js"></script>
-<script src="h12.js"></script>
-<script src="h13.js"></script>
-<script src="h14.js"></script>
-<script src="h15.js"></script>
-<script src="h16.js"></script>
-<script src="h17.js"></script>
-<script src="j0.js"></script>
-<script src="j1.js"></script>
-<script src="j2.js"></script>
-<script src="j3.js"></script>
-<script src="j4.js"></script>
-<script src="j5.js"></script>
-<script src="j6.js"></script>
-<script src="j7.js"></script>
-<script src="j8.js"></script>
-<script src="j9.js"></script>
-<script src="j10.js"></script>
-<script src="j11.js"></script>
-<script src="j12.js"></script>
-<script src="j13.js"></script>
-<script src="j14.js"></script>
-<script src="j15.js"></script>
-<script src="j16.js"></script>
-<script src="j17.js"></script>
-<script src="j18.js"></script>
-<script src="j19.js"></script>
-<script>
-(function(){
-  try {
-    var html = atob((window.__HB||[]).join(''));
-    var js = atob((window.__JB||[]).join(''));
-    document.open();
-    document.write(html);
-    document.close();
-    var s = document.createElement('script');
-    s.text = js;
-    document.documentElement.appendChild(s);
-  } catch (e) {
-    document.body.innerHTML = '<div style="color:#ff5252;padding:40px;text-align:center;font-family:sans-serif">Load error: '+(e.message||e)+'</div>';
-  }
-})();
-</script>
-</body></html>
+<body>
+  <div id="boot">Loading <b>TradeClaw</b>…</div>
+  <script>
+  (function () {
+    var COMMIT = '13c5b729030c7b93f124e13d1604ec45afb5ea2a';
+    var base = 'https://cdn.jsdelivr.net/gh/Dennisbed1234/TradeClaw@' + COMMIT + '/';
+
+    function brand(s) {
+      return String(s)
+        .split('Meme Pump — AI Trading Bot').join('TradeClaw — AI Meme Trading')
+        .split('Meme Pump').join('TradeClaw')
+        .split('Meme Coins').join('Markets');
+    }
+
+    Promise.all([
+      fetch(base + 'index.html').then(function (r) {
+        if (!r.ok) throw new Error('HTML ' + r.status);
+        return r.text();
+      }),
+      fetch(base + 'app.js').then(function (r) {
+        if (!r.ok) throw new Error('JS ' + r.status);
+        return r.text();
+      })
+    ])
+      .then(function (pair) {
+        var html = brand(pair[0]);
+        var js = brand(pair[1]);
+
+        // Remove the original <script src="app.js"> so we inject our copy
+        html = html.replace(/<script\s+src=["']app\.js["']\s*><\/script>/i, '');
+
+        document.open();
+        document.write(html);
+        document.close();
+
+        // Run app logic after DOM from document.write is ready
+        var s = document.createElement('script');
+        s.text = js;
+        document.body.appendChild(s);
+      })
+      .catch(function (e) {
+        document.getElementById('boot').innerHTML =
+          '<span style="color:#ff5252">Could not load TradeClaw.</span><br><br>' +
+          (e.message || e) +
+          '<br><br>Hard-refresh, or restore index.html + app.js from commit 13c5b729 on GitHub.';
+      });
+  })();
+  </script>
+</body>
+</html>
