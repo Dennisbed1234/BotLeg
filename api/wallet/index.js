@@ -31,8 +31,8 @@ module.exports = async function handler(req, res) {
       if (!(amt > 0)) return json(res, 400, { error: 'Enter a valid amount' });
       const bal = await getBalance(db, user.id);
       const next = await setBalance(db, user.id, bal + amt);
-      await addTx(db, user.id, 'deposit', 'Deposit (admin credit)', amt, '');
-      return json(res, 200, { balance: next, message: 'Admin credit: $' + amt.toFixed(2) + ' added.' });
+      await addTx(db, user.id, 'deposit', 'Deposit', amt, '');
+      return json(res, 200, { balance: next, message: 'Deposit $' + amt.toFixed(2) + ' added.' });
     }
 
     if (action === 'withdraw') {

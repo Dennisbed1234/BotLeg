@@ -47,14 +47,12 @@ module.exports = async function handler(req, res) {
       const bal = await getBalance(db, userId);
       const next = await setBalance(db, userId, bal + posVal);
 
-      await addTx(
-        db,
-        userId,
-        'trade',
-        'Trade ' + coin + (pnl >= 0 ? ' (profit)' : ' (loss)'),
-        pnl,
-        mult.toFixed(2) + 'x · size $' + amount
-      );
+      const label = pnl >= 0
+        ? ('Profit · ' + coin)
+        : ('Loss · ' + coin);
+      const meta = mult.toFixed(2) + 'x · size $' + amount;
+
+      await addTx(db, userId, 'trade', label, pnl, meta);
 
       await db`
         INSERT INTO trades (user_id, coin, emoji, amount_usd, start_price, end_price, mult, pnl_usd)
