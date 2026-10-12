@@ -47,9 +47,8 @@ module.exports = async function handler(req, res) {
       const bal = await getBalance(db, userId);
       const next = await setBalance(db, userId, bal + posVal);
 
-      const label = pnl >= 0
-        ? ('Profit · ' + coin)
-        : ('Loss · ' + coin);
+      // Keep preferred history style: "Trade POPCAT (profit)"
+      const label = 'Trade ' + coin + (pnl >= 0 ? ' (profit)' : ' (loss)');
       const meta = mult.toFixed(2) + 'x · size $' + amount;
 
       await addTx(db, userId, 'trade', label, pnl, meta);
