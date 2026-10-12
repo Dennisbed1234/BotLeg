@@ -66,17 +66,19 @@
     }
 
     function patchHtml(html) {
-      // Remove Clear local note button from transaction history
       html = html.replace(
         /\s*<button class="btn-secondary" onclick="clearTxHistory\(\)" style="width:100%">Clear local note<\/button>\s*/g,
         '\n'
       );
 
+      // Stack P&L vertically but keep it on the RIGHT (as before)
       var extraCss =
-        '.pos-stats{flex-direction:column!important;align-items:flex-start!important;gap:4px!important;}' +
-        '.pos-pnl{display:block!important;text-align:left!important;line-height:1.35!important;' +
-        'font-size:13px!important;max-width:100%!important;word-break:break-word!important;}' +
-        '.pos-tokens{max-width:100%!important;word-break:break-word!important;}';
+        '.pos-stats{display:flex!important;flex-direction:row!important;' +
+        'justify-content:space-between!important;align-items:flex-end!important;gap:8px!important;}' +
+        '.pos-tokens{flex:1!important;min-width:0!important;word-break:break-word!important;}' +
+        '.pos-pnl{display:block!important;text-align:right!important;line-height:1.35!important;' +
+        'font-size:13px!important;flex:none!important;max-width:55%!important;' +
+        'word-break:break-word!important;margin-left:auto!important;}';
       if (html.indexOf('</style>') !== -1) {
         html = html.replace('</style>', extraCss + '</style>');
       }
