@@ -7,42 +7,42 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --bg: #0a0a0f;
-      --card: #12121a;
-      --card2: #16161f;
-      --border: #1e1e2a;
-      --green: #00e676;
-      --red: #ff5252;
-      --muted: #777;
-      --text: #e8e8e8;
+      --bg: #0a0a0f; --card: #12121a; --card2: #16161f; --border: #1e1e2a;
+      --green: #00e676; --red: #ff5252; --muted: #777; --text: #e8e8e8;
     }
     body {
-      background: var(--bg);
-      color: var(--text);
+      background: var(--bg); color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      overflow-x: hidden;
+      min-height: 100vh; display: flex; overflow-x: hidden; padding-top: 48px;
     }
+    .top-nav {
+      position: fixed; top: 0; left: 0; right: 0; height: 48px;
+      background: #0d0d14; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      z-index: 100; padding: 0 12px;
+    }
+    .top-nav .nav-brand {
+      position: absolute; left: 16px; font-weight: 700; font-size: 14px; color: var(--text);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .top-nav .nav-brand span { color: var(--green); }
+    .nav-tab {
+      background: transparent; border: none; color: #888; font-weight: 600; font-size: 13px;
+      padding: 8px 18px; border-radius: 10px; cursor: pointer; transition: all 0.15s;
+      flex: none; width: auto;
+    }
+    .nav-tab:hover { color: #ccc; background: rgba(255,255,255,0.04); }
+    .nav-tab.active { color: #000; background: linear-gradient(135deg, #00c853, #00e676); }
+    .page { display: none; width: 100%; }
+    .page.active { display: flex; flex-direction: column; align-items: center; }
     .sidebar {
-      width: 260px;
-      background: #0d0d14;
-      border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      flex-shrink: 0;
-      transition: transform 0.25s ease;
-      z-index: 50;
+      width: 260px; background: #0d0d14; border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; flex-shrink: 0;
+      transition: transform 0.25s ease; z-index: 50;
     }
     .sidebar-header {
-      padding: 18px 16px 12px;
-      font-weight: 700;
-      font-size: 15px;
-      letter-spacing: 0.3px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      padding: 18px 16px 12px; font-weight: 700; font-size: 15px; letter-spacing: 0.3px;
+      border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between;
     }
     .sidebar-header span { color: var(--green); }
     .coin-list { flex: 1; overflow-y: auto; padding: 8px 0; }
@@ -54,7 +54,7 @@
     .coin-item.active { background: rgba(0, 230, 118, 0.08); border-left-color: var(--green); }
     .coin-avatar {
       width: 36px; height: 36px; border-radius: 50%; background: #1a1a24;
-      display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; overflow: hidden;
+      display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;
     }
     .coin-meta { flex: 1; min-width: 0; }
     .coin-name { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -62,7 +62,7 @@
     .coin-price-side { text-align: right; font-size: 12px; font-variant-numeric: tabular-nums; }
     .main {
       flex: 1; display: flex; flex-direction: column; align-items: center;
-      padding: 24px 12px 12px; min-width: 0; position: relative;
+      padding: 16px 12px 12px; min-width: 0; position: relative;
     }
     .menu-btn {
       display: none; position: absolute; top: 14px; left: 14px; background: var(--card);
@@ -76,7 +76,7 @@
     .header { display: flex; align-items: center; gap: 12px; padding: 16px 18px 6px; }
     .avatar {
       width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #ff6b00, #ffd700);
-      display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; overflow: hidden;
+      display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;
     }
     .token-info { flex: 1; min-width: 0; }
     .token-name { font-weight: 700; font-size: 17px; letter-spacing: 0.2px; }
@@ -131,8 +131,7 @@
     .btn-secondary { background: #1a1a24; color: #ccc; border: 1px solid #2a2a3a; }
     .btn-stop-active {
       background: linear-gradient(135deg, #ff1744, #ff5252) !important;
-      color: #fff !important;
-      border: none !important;
+      color: #fff !important; border: none !important;
     }
     .position {
       margin: 10px 14px 16px; background: var(--card2); border-radius: 14px;
@@ -150,17 +149,88 @@
       font-size: 10px; background: rgba(0,230,118,0.15); color: var(--green);
       padding: 2px 6px; border-radius: 4px; margin-left: 6px; font-weight: 600;
     }
+    .bot-app {
+      width: 100%; max-width: 440px; background: var(--card); border-radius: 20px;
+      overflow: hidden; border: 1px solid var(--border);
+      box-shadow: 0 0 50px rgba(0, 255, 150, 0.06);
+    }
+    .bot-header {
+      padding: 18px 18px 12px; display: flex; align-items: center; gap: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .bot-avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: linear-gradient(135deg, #7c4dff, #00e676);
+      display: flex; align-items: center; justify-content: center; font-size: 22px;
+    }
+    .bot-title { font-weight: 700; font-size: 17px; }
+    .bot-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .bot-body { padding: 14px 16px 18px; display: flex; flex-direction: column; gap: 14px; }
+    .pred-card {
+      background: var(--card2); border: 1px solid #22222e; border-radius: 14px; padding: 14px 16px;
+    }
+    .pred-card h3 {
+      font-size: 12px; color: var(--muted); font-weight: 600; margin-bottom: 10px;
+      text-transform: uppercase; letter-spacing: 0.4px;
+    }
+    .pred-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .pred-stat .label { font-size: 11px; color: var(--muted); }
+    .pred-stat .val { font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 2px; }
+    .pred-stat .val.green { color: var(--green); }
+    .pred-hint {
+      margin-top: 12px; font-size: 12px; line-height: 1.45; color: #aaa;
+      background: rgba(0,230,118,0.06); border: 1px solid rgba(0,230,118,0.12);
+      border-radius: 10px; padding: 10px 12px;
+    }
+    .bot-actions { display: flex; gap: 10px; }
+    .bot-actions button { flex: 1; }
+    .tips-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .tips-list li {
+      font-size: 12px; line-height: 1.45; color: #bbb;
+      padding: 10px 12px; background: var(--card2); border-radius: 10px; border: 1px solid #22222e;
+    }
+    .tips-list li strong { color: var(--green); }
+    .coin-record, .trade-record {
+      background: var(--card2); border: 1px solid #22222e; border-radius: 14px; overflow: hidden;
+    }
+    .record-row {
+      display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+      border-bottom: 1px solid #1a1a24; font-size: 12px;
+    }
+    .record-row:last-child { border-bottom: none; }
+    .record-row .emoji { font-size: 18px; width: 28px; text-align: center; }
+    .record-row .name { font-weight: 600; flex: 1; min-width: 0; }
+    .record-row .meta { color: var(--muted); font-size: 11px; }
+    .record-row .right { text-align: right; font-variant-numeric: tabular-nums; }
+    .empty-msg { padding: 16px; text-align: center; color: var(--muted); font-size: 12px; }
+    .section-title {
+      font-size: 12px; color: var(--muted); font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 8px;
+    }
+    .confidence-bar {
+      height: 6px; background: #1a1a24; border-radius: 3px; margin-top: 8px; overflow: hidden;
+    }
+    .confidence-fill {
+      height: 100%; background: linear-gradient(90deg, #00c853, #00e676); border-radius: 3px;
+      transition: width 0.4s ease;
+    }
     @media (max-width: 720px) {
-      .sidebar { position: fixed; top: 0; left: 0; bottom: 0; transform: translateX(-100%); }
+      .sidebar { position: fixed; top: 48px; left: 0; bottom: 0; transform: translateX(-100%); }
       .sidebar.open { transform: translateX(0); }
       .menu-btn { display: flex; }
       .main { padding-top: 58px; }
-      .overlay-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 45; }
+      .top-nav .nav-brand { display: none; }
+      .overlay-bg { display: none; position: fixed; inset: 0; top: 48px; background: rgba(0,0,0,0.55); z-index: 45; }
       .overlay-bg.show { display: block; }
     }
   </style>
 </head>
 <body>
+  <nav class="top-nav">
+    <div class="nav-brand">Meme Pump <span>●</span></div>
+    <button class="nav-tab active" id="tabTrade" onclick="showPage('trade')">Trade</button>
+    <button class="nav-tab" id="tabBot" onclick="showPage('bot')">AI Bot</button>
+  </nav>
   <div class="overlay-bg" id="overlayBg" onclick="closeSidebar()"></div>
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
@@ -169,7 +239,7 @@
     </div>
     <div class="coin-list" id="coinList"></div>
   </aside>
-  <div class="main">
+  <div class="main page active" id="pageTrade">
     <button class="menu-btn" onclick="openSidebar()">☰</button>
     <div class="app">
       <div class="header">
@@ -224,6 +294,55 @@
     </div>
     <div class="footer">Set your own start price · Live prices for all coins · Live Trading</div>
   </div>
+  <div class="main page" id="pageBot">
+    <div class="bot-app">
+      <div class="bot-header">
+        <div class="bot-avatar">🤖</div>
+        <div>
+          <div class="bot-title">AI Trade Bot</div>
+          <div class="bot-sub">Predicts exit · Suggests size · Coin records</div>
+        </div>
+      </div>
+      <div class="bot-body">
+        <div>
+          <div class="section-title">Prediction for <span id="botCoinName">SWORDCAT</span></div>
+          <div class="pred-card">
+            <h3>Where this run stops</h3>
+            <div class="pred-grid">
+              <div class="pred-stat"><div class="label">Exit price</div><div class="val green" id="predPrice">—</div></div>
+              <div class="pred-stat"><div class="label">Exit mcap</div><div class="val green" id="predMcap">—</div></div>
+              <div class="pred-stat"><div class="label">Multiplier</div><div class="val green" id="predMult">—</div></div>
+              <div class="pred-stat"><div class="label">Suggested $</div><div class="val" id="predAmount">—</div></div>
+            </div>
+            <div class="confidence-bar"><div class="confidence-fill" id="predConf" style="width:0%"></div></div>
+            <div class="pred-hint" id="predHint">Select a coin on Trade, then hit Analyze.</div>
+          </div>
+        </div>
+        <div class="bot-actions">
+          <button onclick="runBotAnalysis()">Analyze</button>
+          <button class="btn-secondary" onclick="applyBotSuggestion()">Use amount</button>
+        </div>
+        <div>
+          <div class="section-title">How to trade this sim</div>
+          <ul class="tips-list">
+            <li><strong>0–10s:</strong> Random chop — don’t panic-sell dips. Position is already open.</li>
+            <li><strong>10–15s:</strong> Slow climb starts. This is where most of the gain builds.</li>
+            <li><strong>15–20s:</strong> Super-slow crawl into the finish. Exit near the end or hit Stop to lock PnL.</li>
+            <li><strong>Stop:</strong> Freezes the chart. Change trade amount only when you want a fresh run.</li>
+          </ul>
+        </div>
+        <div>
+          <div class="section-title">All coins record</div>
+          <div class="coin-record" id="coinRecord"></div>
+        </div>
+        <div>
+          <div class="section-title">Trade history</div>
+          <div class="trade-record" id="tradeRecord"><div class="empty-msg">No trades yet — run a sim on Trade.</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="footer">Simulated advice only · Not financial advice</div>
+  </div>
   <script>
     const COINS = [
       { id: 'swordcat', name: 'SWORDCAT', sub: 'cat wif sword', emoji: '⚔️', ca: '5tCju6YNxHq5zrA6tGndr6F7TK42mpUFmeE31cSFpump', supply: 960_000_000, live: true, startPrice: 0.0034, cgId: null },
@@ -252,6 +371,9 @@
     let running = false, prices = [], currentPrice = 0.0034, startPrice = 0.0034;
     let tradeAmount = 1000, tokens = 0, phase = 'idle', tick = 0, boomTarget = 0, animId = null, simStartTime = 0;
     const TOTAL_MS = 20000, PHASE_MS = 5000, TICK_MS = 40;
+    let tradeHistory = [];
+    try { tradeHistory = JSON.parse(localStorage.getItem('mps_trade_history') || '[]'); } catch (e) { tradeHistory = []; }
+    let lastPrediction = null;
     function formatPrice(p) {
       if (p >= 1000) return '$' + p.toLocaleString('en-US', { maximumFractionDigits: 2 });
       if (p >= 1) return '$' + p.toFixed(4);
@@ -273,6 +395,124 @@
       const custom = parseFloat(document.getElementById('customPrice').value);
       if (custom > 0) return custom;
       return livePriceCache[currentCoin.id] || currentCoin.startPrice;
+    }
+    function showPage(name) {
+      document.getElementById('pageTrade').classList.toggle('active', name === 'trade');
+      document.getElementById('pageBot').classList.toggle('active', name === 'bot');
+      document.getElementById('tabTrade').classList.toggle('active', name === 'trade');
+      document.getElementById('tabBot').classList.toggle('active', name === 'bot');
+      if (name === 'bot') {
+        document.getElementById('botCoinName').textContent = currentCoin.name;
+        renderCoinRecord();
+        renderTradeRecord();
+        if (!lastPrediction || lastPrediction.coinId !== currentCoin.id) runBotAnalysis();
+      }
+      closeSidebar();
+    }
+    function estimateSimMultiplier() {
+      let p = 0.85 + Math.random() * 0.45;
+      for (let i = 0; i < 125; i++) {
+        const rise = 0.006 + Math.random() * 0.008;
+        p *= (1 + rise * 0.85);
+        p *= (1 + (Math.random() - 0.45) * 0.006);
+      }
+      for (let i = 0; i < 125; i++) {
+        const rise = 0.002 + Math.random() * 0.0035;
+        p *= (1 + rise);
+        p *= (1 + (Math.random() - 0.48) * 0.002);
+      }
+      return Math.max(2.2, Math.min(14, p));
+    }
+    function suggestedAmount(mult) {
+      const base = 500 + Math.round(mult * 80);
+      const options = [250, 500, 750, 1000, 1500, 2000, 2500, 3000];
+      let best = options[0];
+      for (const o of options) { if (Math.abs(o - base) < Math.abs(best - base)) best = o; }
+      return best;
+    }
+    function runBotAnalysis() {
+      const base = getBasePrice();
+      const mult = estimateSimMultiplier();
+      const exitPrice = base * mult;
+      const exitMcap = exitPrice * currentCoin.supply;
+      const amount = suggestedAmount(mult);
+      const confidence = Math.round(62 + Math.random() * 28);
+      lastPrediction = {
+        coinId: currentCoin.id, coinName: currentCoin.name, emoji: currentCoin.emoji,
+        startPrice: base, exitPrice, exitMcap, mult, amount, confidence, at: Date.now()
+      };
+      document.getElementById('botCoinName').textContent = currentCoin.name;
+      document.getElementById('predPrice').textContent = formatPrice(exitPrice);
+      document.getElementById('predMcap').textContent = formatMcap(exitMcap);
+      document.getElementById('predMult').textContent = mult.toFixed(2) + 'x';
+      document.getElementById('predAmount').textContent = formatMoney(amount);
+      document.getElementById('predConf').style.width = confidence + '%';
+      document.getElementById('predHint').innerHTML =
+        'Bot models the same 20s path (chop → slow climb → crawl). ' +
+        'Predicted exit <strong style="color:var(--green)">' + formatPrice(exitPrice) +
+        '</strong> (~' + mult.toFixed(1) + 'x). Suggested size <strong style="color:#fff">' +
+        formatMoney(amount) + '</strong> · confidence ' + confidence + '%.';
+      try {
+        const map = JSON.parse(localStorage.getItem('mps_coin_preds') || '{}');
+        map[currentCoin.id] = lastPrediction;
+        localStorage.setItem('mps_coin_preds', JSON.stringify(map));
+      } catch (e) {}
+      renderCoinRecord();
+    }
+    function applyBotSuggestion() {
+      if (!lastPrediction) runBotAnalysis();
+      document.getElementById('amount').value = lastPrediction.amount;
+      showPage('trade');
+      const el = document.getElementById('amount');
+      el.style.borderColor = 'var(--green)';
+      setTimeout(() => { el.style.borderColor = ''; }, 1200);
+    }
+    function renderCoinRecord() {
+      const el = document.getElementById('coinRecord');
+      if (!el) return;
+      let preds = {};
+      try { preds = JSON.parse(localStorage.getItem('mps_coin_preds') || '{}'); } catch (e) {}
+      el.innerHTML = COINS.map(coin => {
+        const price = livePriceCache[coin.id] || coin.startPrice;
+        const pred = preds[coin.id];
+        const predTxt = pred ? ('Pred ' + pred.mult.toFixed(1) + 'x → ' + formatMcap(pred.exitMcap)) : 'No analysis yet';
+        return '<div class="record-row"><div class="emoji">' + coin.emoji + '</div><div class="name">' + coin.name +
+          '<div class="meta">' + predTxt + '</div></div><div class="right">' + formatPrice(price) +
+          '<div class="meta">' + formatMcap(price * coin.supply) + '</div></div></div>';
+      }).join('');
+    }
+    function renderTradeRecord() {
+      const el = document.getElementById('tradeRecord');
+      if (!el) return;
+      if (!tradeHistory.length) {
+        el.innerHTML = '<div class="empty-msg">No trades yet — run a sim on Trade.</div>';
+        return;
+      }
+      el.innerHTML = tradeHistory.slice(0, 20).map(tr => {
+        const pnlClass = tr.pnl >= 0 ? 'green' : 'red';
+        const sign = tr.pnl >= 0 ? '+' : '';
+        return '<div class="record-row"><div class="emoji">' + (tr.emoji || '🪙') + '</div><div class="name">' + tr.coin +
+          '<div class="meta">' + new Date(tr.at).toLocaleString() +
+          (tr.predicted ? ' · pred ' + tr.predicted.toFixed(1) + 'x' : '') +
+          '</div></div><div class="right ' + pnlClass + '">' + sign + formatMoney(tr.pnl) +
+          '<div class="meta">' + tr.mult.toFixed(2) + 'x · $' + tr.amount + '</div></div></div>';
+      }).join('');
+    }
+    function recordTrade(finalPrice) {
+      if (!tokens || !startPrice) return;
+      const posVal = tokens * finalPrice;
+      const pnl = posVal - tradeAmount;
+      const mult = startPrice > 0 ? finalPrice / startPrice : 1;
+      const entry = {
+        coin: currentCoin.name, emoji: currentCoin.emoji, amount: tradeAmount,
+        startPrice, endPrice: finalPrice, mult, pnl,
+        predicted: lastPrediction && lastPrediction.coinId === currentCoin.id ? lastPrediction.mult : null,
+        at: Date.now()
+      };
+      tradeHistory.unshift(entry);
+      if (tradeHistory.length > 50) tradeHistory = tradeHistory.slice(0, 50);
+      try { localStorage.setItem('mps_trade_history', JSON.stringify(tradeHistory)); } catch (e) {}
+      renderTradeRecord();
     }
     function updateUI() {
       const mcap = currentPrice * currentCoin.supply;
@@ -378,6 +618,7 @@
         stopBtn.classList.remove('btn-stop-active');
         document.getElementById('amount').disabled = false;
         document.getElementById('customPrice').disabled = false;
+        recordTrade(currentPrice);
       } else if (elapsed < PHASE_MS * 2) {
         phase = 'chop';
         const vol = currentPrice * (0.018 + Math.random() * 0.022);
@@ -422,6 +663,7 @@
       updateUI(); drawChart(); tickSim();
     }
     function resetSim() {
+      const wasRunning = running;
       running = false;
       if (animId) cancelAnimationFrame(animId);
       phase = 'done';
@@ -433,6 +675,7 @@
       stopBtn.textContent = 'Stop';
       document.getElementById('amount').disabled = false;
       document.getElementById('customPrice').disabled = false;
+      if (wasRunning && tokens > 0) recordTrade(currentPrice);
       updateUI();
       drawChart();
     }
@@ -441,10 +684,7 @@
       if (animId) cancelAnimationFrame(animId);
       phase = 'idle';
       const base = getBasePrice();
-      currentPrice = base;
-      startPrice = base;
-      prices = [currentPrice];
-      tokens = 0;
+      currentPrice = base; startPrice = base; prices = [currentPrice]; tokens = 0;
       tradeAmount = parseFloat(document.getElementById('amount').value) || 1000;
       const startBtn = document.getElementById('startBtn');
       const stopBtn = document.getElementById('resetBtn');
@@ -477,6 +717,9 @@
       document.getElementById('avatar').textContent = coin.emoji;
       document.getElementById('customPrice').value = '';
       clearProgress();
+      lastPrediction = null;
+      const botName = document.getElementById('botCoinName');
+      if (botName) botName.textContent = coin.name;
       closeSidebar();
     }
     function openSidebar() {
@@ -534,6 +777,7 @@
     async function fetchLivePrice() {
       await Promise.all([fetchSwordcatPrice(), fetchMajorPrices()]);
       renderCoinList();
+      renderCoinRecord();
     }
     document.getElementById('customPrice').addEventListener('input', () => { clearProgress(); });
     document.getElementById('amount').addEventListener('input', () => { clearProgress(); });
