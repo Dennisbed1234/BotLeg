@@ -18,8 +18,8 @@
     .top-nav {
       position: fixed; top: 0; left: 0; right: 0; height: 48px;
       background: #0d0d14; border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: center; gap: 6px;
-      z-index: 100; padding: 0 12px;
+      display: flex; align-items: center; justify-content: center; gap: 4px;
+      z-index: 100; padding: 0 8px;
     }
     .top-nav .nav-brand {
       position: absolute; left: 16px; font-weight: 700; font-size: 14px; color: var(--text);
@@ -28,7 +28,7 @@
     .top-nav .nav-brand span { color: var(--green); }
     .nav-tab {
       background: transparent; border: none; color: #888; font-weight: 600; font-size: 12px;
-      padding: 8px 12px; border-radius: 10px; cursor: pointer; transition: all 0.15s;
+      padding: 8px 10px; border-radius: 10px; cursor: pointer; transition: all 0.15s;
       flex: none; width: auto;
     }
     .nav-tab:hover { color: #ccc; background: rgba(255,255,255,0.04); }
@@ -283,7 +283,7 @@
       .overlay-bg.show { display: block; }
     }
     @media (max-width: 420px) {
-      .nav-tab { padding: 8px 10px; font-size: 11px; }
+      .nav-tab { padding: 8px 6px; font-size: 10px; }
     }
   </style>
 </head>
@@ -293,6 +293,7 @@
     <button class="nav-tab" id="tabTrade" onclick="showPage('trade')">Trade</button>
     <button class="nav-tab" id="tabBot" onclick="showPage('bot')">AI Bot</button>
     <button class="nav-tab" id="tabWallet" onclick="showPage('wallet')">Wallet</button>
+    <button class="nav-tab" id="tabTx" onclick="showPage('tx')">History</button>
     <button class="nav-tab active" id="tabAuth" onclick="showPage('auth')">Account</button>
   </nav>
   <div class="overlay-bg" id="overlayBg" onclick="closeSidebar()"></div>
@@ -458,6 +459,21 @@
       </div>
     </div>
     <div class="footer">Solana deposits · Manage your balance</div>
+  </div>
+  <div class="main page" id="pageTx">
+    <div class="wallet-app">
+      <div class="wallet-header">
+        <h2>Transaction History</h2>
+        <p>Deposits · Swaps · Trades · Withdrawals</p>
+      </div>
+      <div class="wallet-body">
+        <div class="wallet-section" style="padding:0;overflow:hidden">
+          <div id="txList"><div class="empty-msg">No transactions yet.</div></div>
+        </div>
+        <button class="btn-secondary" style="width:100%" onclick="clearTxHistory()">Clear history</button>
+      </div>
+    </div>
+    <div class="footer">All activity on this device</div>
   </div>
   <div class="main page active" id="pageAuth">
     <div class="auth-app">
