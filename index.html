@@ -186,12 +186,6 @@
     }
     .bot-actions { display: flex; gap: 10px; }
     .bot-actions button { flex: 1; }
-    .tips-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-    .tips-list li {
-      font-size: 12px; line-height: 1.45; color: #bbb;
-      padding: 10px 12px; background: var(--card2); border-radius: 10px; border: 1px solid #22222e;
-    }
-    .tips-list li strong { color: var(--green); }
     .coin-record, .trade-record {
       background: var(--card2); border: 1px solid #22222e; border-radius: 14px; overflow: hidden;
     }
@@ -325,15 +319,6 @@
           <button class="btn-secondary" onclick="applyBotSuggestion()">Use amount</button>
         </div>
         <div>
-          <div class="section-title">How to trade this sim</div>
-          <ul class="tips-list">
-            <li><strong>0–10s:</strong> Random chop — don’t panic-sell dips. Position is already open.</li>
-            <li><strong>10–15s:</strong> Slow climb starts. This is where most of the gain builds.</li>
-            <li><strong>15–20s:</strong> Super-slow crawl into the finish. Exit near the end or hit Stop to lock PnL.</li>
-            <li><strong>Stop:</strong> Freezes the chart. Change trade amount only when you want a fresh run.</li>
-          </ul>
-        </div>
-        <div>
           <div class="section-title">All coins record</div>
           <div class="coin-record" id="coinRecord"></div>
         </div>
@@ -443,10 +428,16 @@
       return { coinId: currentCoin.id, base, prices: path, endPrice, mult };
     }
     function suggestedAmount(mult) {
-      const baseAmt = 500 + Math.round(mult * 80);
-      const options = [250, 500, 750, 1000, 1500, 2000, 2500, 3000];
+      const options = [500, 750, 1000, 1500, 2000, 2500, 3000, 4000, 5000, 7500, 10000, 15000, 20000, 25000];
+      const target = 800 + mult * 900 + Math.random() * 4000;
       let best = options[0];
-      for (const o of options) { if (Math.abs(o - baseAmt) < Math.abs(best - baseAmt)) best = o; }
+      for (const o of options) {
+        if (Math.abs(o - target) < Math.abs(best - target)) best = o;
+      }
+      const idx = options.indexOf(best);
+      if (Math.random() < 0.25 && idx < options.length - 2) {
+        best = options[idx + 1 + Math.floor(Math.random() * Math.min(3, options.length - idx - 1))];
+      }
       return best;
     }
     function runBotAnalysis() {
