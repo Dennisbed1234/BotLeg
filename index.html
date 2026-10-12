@@ -24,6 +24,41 @@
         .split('Meme Coins').join('Markets');
     }
 
+    // Replace fragile resize so canvas never stays 0x0 after document.write
+    function patchJs(js) {
+      var robustResize =
+        'function resize() {\n' +
+        '  if (!canvas || !canvas.parentElement) return;\n' +
+        '  var parent = canvas.parentElement;\n' +
+        '  var rw = parent.getBoundingClientRect().width;\n' +
+        '  var rh = parent.getBoundingClientRect().height;\n' +
+        '  if (!(rw > 10)) rw = parent.clientWidth || parent.offsetWidth || 360;\n' +
+        '  if (!(rh > 10)) rh = parent.clientHeight || parent.offsetHeight || 260;\n' +
+        '  var dpr = devicePixelRatio || 1;\n' +
+        '  canvas.width = rw * dpr; canvas.height = rh * dpr;\n' +
+        '  canvas.style.width = rw + "px"; canvas.style.height = rh + "px";\n' +
+        '  ctx.setTransform(dpr, 0, 0, dpr, 0, 0); W = rw; H = rh;\n' +
+        '}\n';
+
+      // Swap the original resize function body
+      js = js.replace(
+        /function resize\(\) \{[\s\S]*?W = rect\.width; H = rect\.height;\n\}/,
+        robustResize.trim()
+      );
+
+      // After initial resize(), force another pass once layout settles
+      js = js.replace(
+        'resize();\nlet running',
+        'resize();\n' +
+        'setTimeout(function(){ try{ resize(); if(typeof drawChart==="function") drawChart(); }catch(e){} }, 0);\n' +
+        'setTimeout(function(){ try{ resize(); if(typeof drawChart==="function") drawChart(); }catch(e){} }, 100);\n' +
+        'setTimeout(function(){ try{ resize(); if(typeof drawChart==="function") drawChart(); }catch(e){} }, 400);\n' +
+        'let running'
+      );
+
+      return js;
+    }
+
     function forceChartReady() {
       try {
         if (typeof resize === 'function') resize();
@@ -43,41 +78,33 @@
     ])
       .then(function (pair) {
         var html = brand(pair[0]);
-        var js = brand(pair[1]);
+        var js = patchJs(brand(pair[1]));
 
-        // Drop remote app.js tag — we inject the script ourselves
         html = html.replace(/<script\s+src=["']app\.js["']\s*><\/script>/gi, '');
 
         document.open();
         document.write(html);
         document.close();
 
-        // Inject app logic
         var s = document.createElement('script');
         s.text = js;
         document.body.appendChild(s);
 
-        // Canvas often measures 0x0 right after document.write — retry layout
         forceChartReady();
         requestAnimationFrame(function () {
           forceChartReady();
           setTimeout(forceChartReady, 50);
           setTimeout(forceChartReady, 200);
-          setTimeout(forceChartReady, 500);
-          setTimeout(forceChartReady, 1000);
+          setTimeout(forceChartReady, 600);
         });
         window.addEventListener('resize', forceChartReady);
-        window.addEventListener('orientationchange', function () {
-          setTimeout(forceChartReady, 100);
-        });
       })
       .catch(function (e) {
         var el = document.getElementById('boot');
         if (el) {
           el.innerHTML =
             '<span style="color:#ff5252">Could not load TradeClaw.</span><br><br>' +
-            (e.message || e) +
-            '<br><br>Hard-refresh, or restore index.html + app.js from commit 13c5b729 on GitHub.';
+            (e.message || e);
         }
       });
   })();
