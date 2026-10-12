@@ -24,8 +24,8 @@
         .split('Meme Coins').join('Markets');
     }
 
-    // Replace fragile resize so canvas never stays 0x0 after document.write
     function patchJs(js) {
+      // Robust canvas resize (blank-chart fix)
       var robustResize =
         'function resize() {\n' +
         '  if (!canvas || !canvas.parentElement) return;\n' +
@@ -39,14 +39,10 @@
         '  canvas.style.width = rw + "px"; canvas.style.height = rh + "px";\n' +
         '  ctx.setTransform(dpr, 0, 0, dpr, 0, 0); W = rw; H = rh;\n' +
         '}\n';
-
-      // Swap the original resize function body
       js = js.replace(
         /function resize\(\) \{[\s\S]*?W = rect\.width; H = rect\.height;\n\}/,
         robustResize.trim()
       );
-
-      // After initial resize(), force another pass once layout settles
       js = js.replace(
         'resize();\nlet running',
         'resize();\n' +
@@ -56,7 +52,32 @@
         'let running'
       );
 
+      // Stack P&L: amount on first line, percent on second (no side-by-side stretch)
+      js = js.split(
+        "pnlEl.textContent = (pnl>=0?'+':'') + formatMoney(pnl) + ' · ' + (pnlPct>=0?'▲ ':'▼ ') + Math.abs(pnlPct).toFixed(2) + '%';"
+      ).join(
+        "pnlEl.innerHTML = (pnl>=0?'+':'') + formatMoney(pnl) + '<br>' + (pnlPct>=0?'▲ ':'▼ ') + Math.abs(pnlPct).toFixed(2) + '%';"
+      );
+      js = js.split(
+        "pnlEl.textContent = '+$0.00 · 0.00%';"
+      ).join(
+        "pnlEl.innerHTML = '+$0.00<br>▲ 0.00%';"
+      );
+
       return js;
+    }
+
+    function patchHtml(html) {
+      // Stack pos-stats column; keep P&L from stretching full width
+      var extraCss =
+        '.pos-stats{flex-direction:column!important;align-items:flex-start!important;gap:4px!important;}' +
+        '.pos-pnl{display:block!important;text-align:left!important;line-height:1.35!important;' +
+        'font-size:13px!important;max-width:100%!important;word-break:break-word!important;}' +
+        '.pos-tokens{max-width:100%!important;word-break:break-word!important;}';
+      if (html.indexOf('</style>') !== -1) {
+        html = html.replace('</style>', extraCss + '</style>');
+      }
+      return html;
     }
 
     function forceChartReady() {
@@ -77,9 +98,8 @@
       })
     ])
       .then(function (pair) {
-        var html = brand(pair[0]);
+        var html = patchHtml(brand(pair[0]));
         var js = patchJs(brand(pair[1]));
-
         html = html.replace(/<script\s+src=["']app\.js["']\s*><\/script>/gi, '');
 
         document.open();
