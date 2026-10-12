@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Meme Pump Simulator</title>
+  <title>Meme Pump — AI Trading Bot</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -111,11 +111,11 @@
     .input-row { display: flex; gap: 10px; }
     .input-group { flex: 1; display: flex; flex-direction: column; gap: 4px; }
     .input-group label { font-size: 11px; color: var(--muted); padding-left: 2px; }
-    input[type="number"] {
+    input[type="number"], input[type="text"], input[type="email"], input[type="password"], input[type="tel"], input[type="date"] {
       width: 100%; background: #1a1a24; border: 1px solid #2a2a3a; border-radius: 12px;
-      color: #fff; font-size: 15px; padding: 11px 12px; outline: none; font-variant-numeric: tabular-nums;
+      color: #fff; font-size: 15px; padding: 11px 12px; outline: none; font-family: inherit;
     }
-    input[type="number"]:focus { border-color: var(--green); }
+    input:focus { border-color: var(--green); }
     .btn-row { display: flex; gap: 10px; }
     button {
       flex: 1; background: linear-gradient(135deg, #00c853, #00e676); color: #000; border: none;
@@ -229,7 +229,6 @@
       color: #fff; font-size: 14px; padding: 12px 14px; outline: none; font-family: inherit;
     }
     .form-group input:focus, .select-input:focus { border-color: var(--green); }
-    .select-input { appearance: none; -webkit-appearance: none; }
     .auth-msg, .wallet-msg {
       font-size: 12px; text-align: center; min-height: 18px; color: var(--muted);
     }
@@ -273,6 +272,73 @@
     }
     .qr-wrap canvas { width: 160px; height: 160px; border-radius: 10px; background: #fff; }
     .qr-hint { font-size: 11px; color: var(--muted); }
+    .pw-wrap { position: relative; }
+    .pw-wrap input { padding-right: 44px; }
+    .pw-toggle {
+      position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; color: #888; font-size: 13px; cursor: pointer;
+      width: auto; padding: 4px 6px; flex: none;
+    }
+    .pw-toggle:hover { color: var(--green); }
+    .signup-extra { display: none; flex-direction: column; gap: 14px; }
+    .signup-extra.show { display: flex; }
+    .form-row { display: flex; gap: 10px; }
+    .form-row .form-group { flex: 1; min-width: 0; }
+    .home-app { width: 100%; max-width: 520px; display: flex; flex-direction: column; gap: 16px; }
+    .home-hero {
+      background: var(--card); border: 1px solid var(--border); border-radius: 20px;
+      padding: 28px 22px; text-align: center;
+      box-shadow: 0 0 60px rgba(0, 230, 118, 0.08);
+      position: relative; overflow: hidden;
+    }
+    .home-hero::before {
+      content: ''; position: absolute; inset: -40% -20% auto;
+      height: 120%; background: radial-gradient(ellipse, rgba(0,230,118,0.12), transparent 60%);
+      pointer-events: none;
+    }
+    .home-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(0,230,118,0.12); border: 1px solid rgba(0,230,118,0.3);
+      color: var(--green); font-size: 11px; font-weight: 700;
+      padding: 5px 12px; border-radius: 20px; letter-spacing: 0.4px;
+      text-transform: uppercase; margin-bottom: 14px;
+    }
+    .home-hero h1 {
+      font-size: 26px; font-weight: 800; line-height: 1.2; margin-bottom: 10px; position: relative;
+    }
+    .home-hero h1 span { color: var(--green); }
+    .home-hero .lead {
+      font-size: 14px; color: #aaa; line-height: 1.5; max-width: 380px; margin: 0 auto 18px; position: relative;
+    }
+    .home-cta { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; position: relative; }
+    .home-cta button { width: auto; min-width: 140px; }
+    .home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 480px) { .home-grid { grid-template-columns: 1fr; } }
+    .home-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+      padding: 16px; text-align: left;
+    }
+    .home-card .icon { font-size: 28px; margin-bottom: 8px; }
+    .home-card h3 { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+    .home-card p { font-size: 12px; color: #999; line-height: 1.45; }
+    .home-ai {
+      background: linear-gradient(145deg, #12121a, #0d1a14);
+      border: 1px solid rgba(0,230,118,0.25); border-radius: 20px; padding: 20px 18px;
+    }
+    .home-ai h2 {
+      font-size: 16px; font-weight: 700; margin-bottom: 8px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .home-ai .sub { font-size: 13px; color: #aaa; line-height: 1.5; margin-bottom: 14px; }
+    .ai-points { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .ai-points li {
+      display: flex; gap: 10px; align-items: flex-start;
+      font-size: 13px; color: #ccc; line-height: 1.4;
+      background: rgba(0,0,0,0.25); border-radius: 12px; padding: 10px 12px;
+      border: 1px solid rgba(255,255,255,0.04);
+    }
+    .ai-points li strong { color: var(--green); display: block; font-size: 13px; margin-bottom: 2px; }
+    .ai-points .ic { font-size: 18px; flex-shrink: 0; }
     @media (max-width: 720px) {
       .sidebar { position: fixed; top: 48px; left: 0; bottom: 0; transform: translateX(-100%); }
       .sidebar.open { transform: translateX(0); }
@@ -290,11 +356,12 @@
 <body>
   <nav class="top-nav">
     <div class="nav-brand">Meme Pump <span>●</span></div>
+    <button class="nav-tab active" id="tabHome" onclick="showPage('home')">Home</button>
     <button class="nav-tab" id="tabTrade" onclick="showPage('trade')">Trade</button>
     <button class="nav-tab" id="tabBot" onclick="showPage('bot')">AI Bot</button>
     <button class="nav-tab" id="tabWallet" onclick="showPage('wallet')">Wallet</button>
     <button class="nav-tab" id="tabTx" onclick="showPage('tx')">History</button>
-    <button class="nav-tab active" id="tabAuth" onclick="showPage('auth')">Account</button>
+    <button class="nav-tab" id="tabAuth" onclick="showPage('auth')">Account</button>
   </nav>
   <div class="overlay-bg" id="overlayBg" onclick="closeSidebar()"></div>
   <aside class="sidebar" id="sidebar">
@@ -304,6 +371,56 @@
     </div>
     <div class="coin-list" id="coinList"></div>
   </aside>
+  <div class="main page active" id="pageHome">
+    <div class="home-app">
+      <div class="home-hero">
+        <div class="home-badge">🤖 AI-Powered · Meme Coins</div>
+        <h1>Trade meme coins with an <span>AI Bot</span> that sees the next 20 seconds</h1>
+        <p class="lead">Meme Pump is a Solana meme-coin trading platform powered by an AI bot that locks a full path prediction — so you know the exit before the chart even moves.</p>
+        <div class="home-cta">
+          <button onclick="showPage('auth')">Get started</button>
+          <button class="btn-secondary" onclick="showPage('bot')">Meet the AI Bot</button>
+        </div>
+      </div>
+      <div class="home-grid">
+        <div class="home-card">
+          <div class="icon">⚡</div>
+          <h3>20-second pumps</h3>
+          <p>Fast momentum trades on SWORDCAT, BONK, WIF, PEPE and more — with live market prices.</p>
+        </div>
+        <div class="home-card">
+          <div class="icon">🎯</div>
+          <h3>Exact exit calls</h3>
+          <p>The bot pre-computes the full price path. Your prediction matches the final print — every time.</p>
+        </div>
+        <div class="home-card">
+          <div class="icon">💰</div>
+          <h3>Wallet on Solana</h3>
+          <p>Deposit SOL, swap into meme coins, track every trade and withdrawal in one place.</p>
+        </div>
+        <div class="home-card">
+          <div class="icon">📈</div>
+          <h3>Real P&amp;L</h3>
+          <p>Profits and losses settle into your balance instantly when each trade ends.</p>
+        </div>
+      </div>
+      <div class="home-ai">
+        <h2>🤖 Why the AI Bot beats human trading</h2>
+        <p class="sub">Humans react. The bot decides before the candle starts.</p>
+        <ul class="ai-points">
+          <li><span class="ic">🧠</span><div><strong>No emotion, no FOMO</strong>It never chases green candles or panic-sells. Every size and exit is pure math from live price data.</div></li>
+          <li><span class="ic">⏱️</span><div><strong>Millisecond path lock</strong>In under a second it generates the full 20s trajectory — chop, climb, and crawl — and sticks to it.</div></li>
+          <li><span class="ic">📊</span><div><strong>Perfect prediction match</strong>What the bot shows is what the chart prints. No “almost” — the exit price is the settled result.</div></li>
+          <li><span class="ic">🎲</span><div><strong>Smart position sizing</strong>Suggested trade size adapts from $100 to $1,000,000 based on expected multiplier strength.</div></li>
+          <li><span class="ic">🌍</span><div><strong>Always online</strong>Markets don’t sleep. The bot doesn’t either — ready whenever you open Trade.</div></li>
+        </ul>
+        <div class="home-cta" style="margin-top:16px">
+          <button onclick="showPage('bot')">Open AI Bot</button>
+          <button class="btn-secondary" onclick="showPage('trade')">Start trading</button>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="main page" id="pageTrade">
     <button class="menu-btn" onclick="openSidebar()">☰</button>
     <div class="app">
@@ -346,9 +463,7 @@
         </div>
       </div>
       <div class="position">
-        <div class="pos-header">
-          <div class="pos-label"><span class="pos-dot"></span> Your position</div>
-        </div>
+        <div class="pos-header"><div class="pos-label"><span class="pos-dot"></span> Your position</div></div>
         <div class="pos-value" id="posValue">$1,000.00</div>
         <div class="pos-stats">
           <div class="pos-tokens" id="posTokens">— tokens</div>
@@ -363,46 +478,42 @@
       <div class="bot-header">
         <div class="bot-avatar">🤖</div>
         <div>
-          <div class="bot-title">AI Trade Bot</div>
-          <div class="bot-sub">Predicts exit · Suggests size · Coin records</div>
+          <div class="bot-title">AI Trading Bot</div>
+          <div class="bot-sub">Predicts the full 20s path · matches the exit</div>
         </div>
       </div>
       <div class="bot-body">
-        <div>
-          <div class="section-title">Prediction for <span id="botCoinName">SWORDCAT</span></div>
-          <div class="pred-card">
-            <h3>Where this run stops</h3>
-            <div class="pred-grid">
-              <div class="pred-stat"><div class="label">Exit price</div><div class="val green" id="predPrice">—</div></div>
-              <div class="pred-stat"><div class="label">Exit mcap</div><div class="val green" id="predMcap">—</div></div>
-              <div class="pred-stat"><div class="label">Multiplier</div><div class="val green" id="predMult">—</div></div>
-              <div class="pred-stat"><div class="label">Suggested $</div><div class="val" id="predAmount">—</div></div>
-            </div>
-            <div class="confidence-bar"><div class="confidence-fill" id="predConf" style="width:0%"></div></div>
-            <div class="pred-hint" id="predHint">Uses live market price. Analyze locks the exact 20s path so prediction = result.</div>
+        <div class="pred-card">
+          <h3>Prediction for <span id="botCoinName">SWORDCAT</span></h3>
+          <div class="pred-grid">
+            <div class="pred-stat"><div class="label">Exit price</div><div class="val green" id="predPrice">—</div></div>
+            <div class="pred-stat"><div class="label">Exit mcap</div><div class="val" id="predMcap">—</div></div>
+            <div class="pred-stat"><div class="label">Multiplier</div><div class="val green" id="predMult">—</div></div>
+            <div class="pred-stat"><div class="label">Suggested size</div><div class="val" id="predAmount">—</div></div>
           </div>
+          <div class="confidence-bar"><div class="confidence-fill" id="predConf" style="width:0%"></div></div>
+          <div class="pred-hint" id="predHint">Run analysis to lock the path.</div>
         </div>
         <div class="bot-actions">
           <button onclick="runBotAnalysis()">Analyze</button>
-          <button class="btn-secondary" onclick="applyBotSuggestion()">Use amount</button>
+          <button class="btn-secondary" onclick="applyBotSuggestion()">Use size</button>
         </div>
         <div>
-          <div class="section-title">All coins record</div>
+          <div class="section-title">Coin record</div>
           <div class="coin-record" id="coinRecord"></div>
         </div>
         <div>
-          <div class="section-title">Trade history</div>
-          <div class="trade-record" id="tradeRecord"><div class="empty-msg">No trades yet — run a sim on Trade.</div></div>
+          <div class="section-title">Your trades</div>
+          <div class="trade-record" id="tradeRecord"></div>
         </div>
       </div>
     </div>
-    <div class="footer">AI predictions for your next run</div>
   </div>
   <div class="main page" id="pageWallet">
     <div class="wallet-app">
       <div class="wallet-header">
         <h2>Wallet</h2>
-        <p>Deposit SOL · Swap · Withdraw</p>
+        <p>Solana deposit · swap · withdraw</p>
       </div>
       <div class="wallet-body">
         <div class="balance-card">
@@ -411,71 +522,64 @@
         </div>
         <div class="wallet-section">
           <h3>Deposit (Solana)</h3>
-          <div class="chain-badge">◎ Solana network</div>
+          <div class="chain-badge">◎ SOLANA</div>
           <div class="qr-wrap">
             <canvas id="qrCanvas" width="160" height="160"></canvas>
             <div class="qr-hint">Scan to deposit</div>
           </div>
-          <div class="form-group">
-            <label>Send SOL / USDC to this address</label>
-            <div class="addr-row">
-              <input type="text" id="depositAddress" readonly value="44vABSx14hrUmkAoV5PwxJeMrNwCHBzrn6RrYx5W4tg2" />
-              <button type="button" onclick="copyDepositAddress()">Copy</button>
-            </div>
+          <div class="addr-row">
+            <input type="text" id="depositAddress" readonly />
+            <button type="button" onclick="copyDepositAddress()">Copy</button>
           </div>
-          <div class="form-group" style="margin-top:10px" id="adminDepositGroup">
-            <label>Amount (USD) — admin instant credit</label>
-            <input type="number" id="depositAmount" placeholder="100" min="1" step="1" />
+          <div id="adminDepositGroup" class="form-group" style="margin-top:12px;display:none">
+            <label>Admin credit amount ($)</label>
+            <input type="number" id="depositAmount" placeholder="1000" min="1" step="1" />
           </div>
-          <button style="margin-top:10px;width:100%" id="depositBtn" onclick="confirmDeposit()">Confirm deposit</button>
+          <button id="depositBtn" onclick="confirmDeposit()" style="width:100%;margin-top:10px">Confirm deposit</button>
           <div class="wallet-msg" id="depositMsg"></div>
         </div>
         <div class="wallet-section">
           <h3>Swap to meme coin</h3>
           <div class="form-group">
-            <label>Amount from balance (USD)</label>
-            <input type="number" id="swapAmount" placeholder="100" min="1" step="1" />
+            <label>Amount ($)</label>
+            <input type="number" id="swapAmount" placeholder="100" min="1" />
           </div>
           <div class="form-group">
-            <label>Convert to</label>
+            <label>Coin</label>
             <select id="swapCoin" class="select-input"></select>
           </div>
-          <button style="margin-top:10px;width:100%" onclick="doSwap()">Swap</button>
+          <button onclick="doSwap()" style="width:100%">Swap</button>
           <div class="wallet-msg" id="swapMsg"></div>
         </div>
         <div class="wallet-section">
           <h3>Withdraw</h3>
           <div class="form-group">
-            <label>Your Solana address</label>
-            <input type="text" id="withdrawAddress" placeholder="Your SOL wallet address" />
+            <label>Solana address</label>
+            <input type="text" id="withdrawAddress" placeholder="Your SOL address" />
           </div>
           <div class="form-group">
-            <label>Amount (USD)</label>
-            <input type="number" id="withdrawAmount" placeholder="50" min="1" step="1" />
+            <label>Amount ($)</label>
+            <input type="number" id="withdrawAmount" placeholder="100" min="1" />
           </div>
-          <button class="btn-secondary" style="margin-top:10px;width:100%" onclick="requestWithdraw()">Request withdraw</button>
+          <button class="btn-secondary" onclick="requestWithdraw()" style="width:100%">Request withdraw</button>
           <div class="wallet-msg" id="withdrawMsg"></div>
         </div>
       </div>
     </div>
-    <div class="footer">Solana deposits · Manage your balance</div>
   </div>
   <div class="main page" id="pageTx">
     <div class="wallet-app">
       <div class="wallet-header">
-        <h2>Transaction History</h2>
-        <p>Deposits · Swaps · Trades · Withdrawals</p>
+        <h2>Transaction history</h2>
+        <p>Deposits, swaps, trades, withdrawals</p>
       </div>
       <div class="wallet-body">
-        <div class="wallet-section" style="padding:0;overflow:hidden">
-          <div id="txList"><div class="empty-msg">No transactions yet.</div></div>
-        </div>
-        <button class="btn-secondary" style="width:100%" onclick="clearTxHistory()">Clear history</button>
+        <div id="txList" class="trade-record"><div class="empty-msg">Loading…</div></div>
+        <button class="btn-secondary" onclick="clearTxHistory()" style="width:100%">Clear local note</button>
       </div>
     </div>
-    <div class="footer">All activity on this device</div>
   </div>
-  <div class="main page active" id="pageAuth">
+  <div class="main page" id="pageAuth">
     <div class="auth-app">
       <div class="auth-header">
         <h2 id="authTitle">Log in</h2>
@@ -488,8 +592,8 @@
             <button type="button" id="authTabSignup" onclick="setAuthMode('signup')">Sign up</button>
           </div>
           <div class="form-group" id="signupNameGroup" style="display:none">
-            <label>Display name</label>
-            <input type="text" id="authName" placeholder="Trader" autocomplete="name" />
+            <label>Full name</label>
+            <input type="text" id="authName" placeholder="Your name" autocomplete="name" />
           </div>
           <div class="form-group">
             <label>Email</label>
@@ -497,7 +601,47 @@
           </div>
           <div class="form-group">
             <label>Password</label>
-            <input type="password" id="authPassword" placeholder="••••••••" autocomplete="current-password" />
+            <div class="pw-wrap">
+              <input type="password" id="authPassword" placeholder="••••••••" autocomplete="current-password" />
+              <button type="button" class="pw-toggle" onclick="togglePassword('authPassword', this)">Show</button>
+            </div>
+          </div>
+          <div class="signup-extra" id="signupExtra">
+            <div class="form-group">
+              <label>Confirm password</label>
+              <div class="pw-wrap">
+                <input type="password" id="authPassword2" placeholder="••••••••" autocomplete="new-password" />
+                <button type="button" class="pw-toggle" onclick="togglePassword('authPassword2', this)">Show</button>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Country</label>
+                <input type="text" id="authCountry" placeholder="e.g. Nigeria" autocomplete="country-name" />
+              </div>
+              <div class="form-group">
+                <label>Phone (with country code)</label>
+                <input type="tel" id="authPhone" placeholder="+234 801 234 5678" autocomplete="tel" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Date of birth</label>
+              <input type="date" id="authDob" />
+            </div>
+            <div class="form-group">
+              <label>Street address</label>
+              <input type="text" id="authAddress" placeholder="123 Main St, Apt 4" autocomplete="street-address" />
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>City</label>
+                <input type="text" id="authCity" placeholder="City" autocomplete="address-level2" />
+              </div>
+              <div class="form-group">
+                <label>Postal / ZIP</label>
+                <input type="text" id="authPostal" placeholder="100001" autocomplete="postal-code" />
+              </div>
+            </div>
           </div>
           <button style="width:100%" id="authSubmitBtn" onclick="submitAuth()">Log in</button>
           <div class="auth-msg" id="authMsg"></div>
@@ -505,11 +649,10 @@
         <div class="auth-logged" id="authLogged">
           <div class="who" id="authWhoName">—</div>
           <div class="who-email" id="authWhoEmail">—</div>
-          <button class="btn-secondary" style="width:100%" id="logoutBtn" onclick="logoutUser()">Log out</button>
+          <button class="btn-secondary" onclick="logoutUser()" style="width:100%">Log out</button>
         </div>
       </div>
     </div>
-    <div class="footer">Secure account access</div>
   </div>
   <script src="app.js"></script>
 </body>
