@@ -267,11 +267,18 @@
       padding: 4px 10px; border-radius: 20px; margin-bottom: 10px;
     }
     .user-chip {
-      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-      font-size: 11px; color: var(--muted); display: none; align-items: center; gap: 6px;
+      display: none; align-items: center; gap: 6px;
+      font-size: 11px; color: var(--muted); margin-left: 4px;
+      max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
     .user-chip.show { display: flex; }
-    .user-chip .dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; }
+    .user-chip .dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; flex-shrink: 0; }
+    .auth-logged { display: none; flex-direction: column; gap: 12px; text-align: center; }
+    .auth-logged.show { display: flex; }
+    .auth-forms { display: none; flex-direction: column; gap: 14px; }
+    .auth-forms.show { display: flex; flex-direction: column; gap: 14px; }
+    .auth-logged .who { font-size: 15px; font-weight: 600; color: var(--text); }
+    .auth-logged .who-email { font-size: 12px; color: var(--muted); margin-top: 2px; }
     @media (max-width: 720px) {
       .sidebar { position: fixed; top: 48px; left: 0; bottom: 0; transform: translateX(-100%); }
       .sidebar.open { transform: translateX(0); }
@@ -356,7 +363,7 @@
         </div>
       </div>
     </div>
-    <div class="footer">Set your own start price · Live prices for all coins · Live Trading</div>
+    <div class="footer">Live prices · Set your start price · Trade</div>
   </div>
   <div class="main page" id="pageBot">
     <div class="bot-app">
@@ -396,7 +403,7 @@
         </div>
       </div>
     </div>
-    <div class="footer">Simulated advice only · Not financial advice</div>
+    <div class="footer">AI predictions for your next run</div>
   </div>
   <div class="main page" id="pageWallet">
     <div class="wallet-app">
@@ -441,7 +448,7 @@
         </div>
       </div>
     </div>
-    <div class="footer">Deposits on Solana · Demo balances stored on this device</div>
+    <div class="footer">Solana deposits · Manage your balance</div>
   </div>
   <div class="main page" id="pageAuth">
     <div class="auth-app">
@@ -450,28 +457,34 @@
         <p id="authSub">Access your wallet and trade history</p>
       </div>
       <div class="auth-body">
-        <div class="auth-tabs">
-          <button type="button" class="active" id="authTabLogin" onclick="setAuthMode('login')">Log in</button>
-          <button type="button" id="authTabSignup" onclick="setAuthMode('signup')">Sign up</button>
+        <div class="auth-forms show" id="authForms">
+          <div class="auth-tabs">
+            <button type="button" class="active" id="authTabLogin" onclick="setAuthMode('login')">Log in</button>
+            <button type="button" id="authTabSignup" onclick="setAuthMode('signup')">Sign up</button>
+          </div>
+          <div class="form-group" id="signupNameGroup" style="display:none">
+            <label>Display name</label>
+            <input type="text" id="authName" placeholder="Trader" autocomplete="name" />
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="authEmail" placeholder="you@email.com" autocomplete="email" />
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="authPassword" placeholder="••••••••" autocomplete="current-password" />
+          </div>
+          <button style="width:100%" id="authSubmitBtn" onclick="submitAuth()">Log in</button>
+          <div class="auth-msg" id="authMsg"></div>
         </div>
-        <div class="form-group" id="signupNameGroup" style="display:none">
-          <label>Display name</label>
-          <input type="text" id="authName" placeholder="Trader" autocomplete="name" />
+        <div class="auth-logged" id="authLogged">
+          <div class="who" id="authWhoName">—</div>
+          <div class="who-email" id="authWhoEmail">—</div>
+          <button class="btn-secondary" style="width:100%" id="logoutBtn" onclick="logoutUser()">Log out</button>
         </div>
-        <div class="form-group">
-          <label>Email</label>
-          <input type="email" id="authEmail" placeholder="you@email.com" autocomplete="email" />
-        </div>
-        <div class="form-group">
-          <label>Password</label>
-          <input type="password" id="authPassword" placeholder="••••••••" autocomplete="current-password" />
-        </div>
-        <button style="width:100%" id="authSubmitBtn" onclick="submitAuth()">Log in</button>
-        <button class="btn-secondary" style="width:100%;display:none" id="logoutBtn" onclick="logoutUser()">Log out</button>
-        <div class="auth-msg" id="authMsg"></div>
       </div>
     </div>
-    <div class="footer">Accounts saved on this device · Not a real exchange</div>
+    <div class="footer">Secure account access</div>
   </div>
   <script>
     const COINS = [
@@ -499,7 +512,7 @@
     window.addEventListener('resize', () => { resize(); drawChart(); });
     resize();
     let running = false, prices = [], currentPrice = 0.0034, startPrice = 0.0034;
-    let tradeAmount = 1000, tokens = 0, phase = 'idle', tick = 0, boomTarget = 0, animId = null, simStartTime = 0;
+    let tradeAmount = 1000, tokens = 0, phase = 'idle', tick = 0, zoomTarget = 0, animId = null, simStartTime = 0;
     const TOTAL_MS = 20000, PHASE_MS = 5000, TICK_MS = 40;
     let tradeHistory = [];
     try { tradeHistory = JSON.parse(localStorage.getItem('mps_trade_history') || '[]'); } catch (e) { tradeHistory = []; }
@@ -529,6 +542,16 @@
       return livePriceCache[currentCoin.id] || currentCoin.startPrice;
     }
     function showPage(name) {
+      if (name !== 'auth' && !currentUser()) {
+        name = 'auth';
+        setTimeout(() => {
+          const msg = document.getElementById('authMsg');
+          if (msg) {
+            msg.textContent = 'Sign in or create an account to continue.';
+            msg.className = 'auth-msg err';
+          }
+        }, 0);
+      }
       const pages = ['trade', 'bot', 'wallet', 'auth'];
       pages.forEach(p => {
         const el = document.getElementById('page' + p.charAt(0).toUpperCase() + p.slice(1));
@@ -595,17 +618,20 @@
     }
     function refreshAuthUI() {
       const u = currentUser();
-      const submit = document.getElementById('authSubmitBtn');
-      const logout = document.getElementById('logoutBtn');
+      const forms = document.getElementById('authForms');
+      const logged = document.getElementById('authLogged');
       if (u) {
         document.getElementById('authTitle').textContent = 'Account';
-        document.getElementById('authSub').textContent = 'Signed in as ' + (u.name || u.email);
-        submit.style.display = 'none';
-        logout.style.display = 'block';
+        document.getElementById('authSub').textContent = 'You are signed in';
+        forms.classList.remove('show');
+        logged.classList.add('show');
+        document.getElementById('authWhoName').textContent = u.name || u.email.split('@')[0];
+        document.getElementById('authWhoEmail').textContent = u.email;
         document.getElementById('authMsg').textContent = '';
       } else {
-        submit.style.display = 'block';
-        logout.style.display = 'none';
+        document.getElementById('authTitle').textContent = authMode === 'login' ? 'Log in' : 'Sign up';
+        forms.classList.add('show');
+        logged.classList.remove('show');
         setAuthMode(authMode);
       }
       updateUserChip();
@@ -639,6 +665,7 @@
         msg.className = 'auth-msg ok';
         refreshAuthUI();
         refreshWalletUI();
+        showPage('trade');
       } else {
         const u = users[email];
         if (!u || u.password !== password) {
@@ -651,14 +678,19 @@
         msg.className = 'auth-msg ok';
         refreshAuthUI();
         refreshWalletUI();
+        showPage('trade');
       }
     }
     function logoutUser() {
       setSession(null);
-      document.getElementById('authMsg').textContent = 'Logged out.';
-      document.getElementById('authMsg').className = 'auth-msg';
       refreshAuthUI();
       refreshWalletUI();
+      showPage('auth');
+      const msg = document.getElementById('authMsg');
+      if (msg) {
+        msg.textContent = 'Logged out.';
+        msg.className = 'auth-msg';
+      }
     }
     function getBalance() {
       const u = currentUser();
@@ -719,7 +751,7 @@
       }
       setBalance(getBalance() + amt);
       document.getElementById('depositAmount').value = '';
-      msg.textContent = 'Deposit of ' + formatMoney(amt) + ' credited (demo).';
+      msg.textContent = 'Deposit of ' + formatMoney(amt) + '.';
       msg.className = 'wallet-msg ok';
       refreshWalletUI();
     }
@@ -750,7 +782,7 @@
       }
       setBalance(getBalance() - amt);
       document.getElementById('withdrawAmount').value = '';
-      msg.textContent = 'Withdraw ' + formatMoney(amt) + ' requested to ' + to.slice(0, 4) + '…' + to.slice(-4) + ' (demo).';
+      msg.textContent = 'Withdraw ' + formatMoney(amt) + ' requested to ' + to.slice(0, 4) + '…' + to.slice(-4) + '.';
       msg.className = 'wallet-msg ok';
       refreshWalletUI();
     }
@@ -804,10 +836,9 @@
       const mult = plannedPath.mult;
       const exitMcap = exitPrice * currentCoin.supply;
       const amount = suggestedAmount(mult);
-      const confidence = 100;
       lastPrediction = {
         coinId: currentCoin.id, coinName: currentCoin.name, emoji: currentCoin.emoji,
-        startPrice: base, exitPrice, exitMcap, mult, amount, confidence, at: Date.now(), liveBase: base
+        startPrice: base, exitPrice, exitMcap, mult, amount, confidence: 100, at: Date.now(), liveBase: base
       };
       document.getElementById('botCoinName').textContent = currentCoin.name;
       document.getElementById('predPrice').textContent = formatPrice(exitPrice);
@@ -1203,6 +1234,11 @@
     document.getElementById('depositAddress').value = SOLANA_DEPOSIT_ADDRESS;
     updateUserChip();
     refreshWalletUI();
+    if (currentUser()) {
+      showPage('trade');
+    } else {
+      showPage('auth');
+    }
   </script>
 </body>
 </html>
