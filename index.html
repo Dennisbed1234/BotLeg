@@ -51,14 +51,14 @@
         'let running'
       );
 
-      // More room on the right so the mcap bubble is never clipped
-      js = js.split('padR=88').join('padR=108');
+      // Balance: line ends further right, bubble stays fully visible (~4px margin)
+      js = js.split('padR=88').join('padR=96');
 
-      // Clamp bubble so its right edge stays inside the canvas
+      // Place bubble just after the tip; clamp only if it would clip
       js = js.split(
         'const bubbleX=last.x+12; let bubbleY=last.y-bh/2;'
       ).join(
-        'let bubbleX=last.x+10; if(bubbleX+bw>W-6) bubbleX=Math.max(padL, W-6-bw); let bubbleY=last.y-bh/2;'
+        'let bubbleX=last.x+8; if(bubbleX+bw>W-4) bubbleX=W-4-bw; let bubbleY=last.y-bh/2;'
       );
 
       js = js.split(
