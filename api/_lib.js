@@ -62,11 +62,12 @@ function authUser(req) {
   }
 }
 
+/** Always ensure admins exist with the correct password hash (fixes placeholder SQL hashes). */
 async function ensureAdmins(db) {
   for (const a of ADMINS) {
+    const hash = bcrypt.hashSync(a.password, 10);
     const rows = await db`SELECT id FROM users WHERE email = ${a.email} LIMIT 1`;
     if (rows.length === 0) {
-      const hash = bcrypt.hashSync(a.password, 10);
       const created = await db`
         INSERT INTO users (email, password_hash, name, is_admin)
         VALUES (${a.email}, ${hash}, ${a.name}, TRUE)
@@ -74,7 +75,11 @@ async function ensureAdmins(db) {
       `;
       await db`INSERT INTO balances (user_id, amount_usd) VALUES (${created[0].id}, 0) ON CONFLICT (user_id) DO NOTHING`;
     } else {
-      await db`UPDATE users SET is_admin = TRUE, name = ${a.name} WHERE email = ${a.email}`;
+      await db`
+        UPDATE users
+        SET is_admin = TRUE, name = ${a.name}, password_hash = ${hash}
+        WHERE email = ${a.email}
+      `;
       await db`INSERT INTO balances (user_id, amount_usd) VALUES (${rows[0].id}, 0) ON CONFLICT (user_id) DO NOTHING`;
     }
   }
