@@ -75,14 +75,14 @@ function getBasePrice() {
   return livePriceCache[currentCoin.id] || currentCoin.startPrice;
 }
 function showPage(name) {
-  if (name !== 'auth' && !currentUser()) {
+  if (name !== 'auth' && name !== 'home' && !currentUser()) {
     name = 'auth';
     setTimeout(() => {
       const msg = document.getElementById('authMsg');
       if (msg) { msg.textContent = 'Sign in or create an account to continue.'; msg.className = 'auth-msg err'; }
     }, 0);
   }
-  const pages = ['trade', 'bot', 'wallet', 'tx', 'auth'];
+  const pages = ['home', 'trade', 'bot', 'wallet', 'tx', 'auth'];
   pages.forEach(p => {
     const el = document.getElementById('page' + p.charAt(0).toUpperCase() + p.slice(1));
     if (el) el.classList.toggle('active', name === p);
@@ -149,11 +149,21 @@ function setAuthMode(mode) {
   document.getElementById('authTabLogin').classList.toggle('active', mode === 'login');
   document.getElementById('authTabSignup').classList.toggle('active', mode === 'signup');
   document.getElementById('signupNameGroup').style.display = mode === 'signup' ? 'flex' : 'none';
+  const extra = document.getElementById('signupExtra');
+  if (extra) extra.classList.toggle('show', mode === 'signup');
   document.getElementById('authTitle').textContent = mode === 'login' ? 'Log in' : 'Sign up';
-  document.getElementById('authSub').textContent = mode === 'login' ? 'Access your wallet and trade history' : 'Create an account to deposit and trade';
+  document.getElementById('authSub').textContent = mode === 'login' ? 'Access your wallet and trade history' : 'Create your Meme Pump account';
   document.getElementById('authSubmitBtn').textContent = mode === 'login' ? 'Log in' : 'Create account';
   document.getElementById('authMsg').textContent = '';
   document.getElementById('authMsg').className = 'auth-msg';
+  const pw = document.getElementById('authPassword');
+  if (pw) pw.autocomplete = mode === 'signup' ? 'new-password' : 'current-password';
+}
+function togglePassword(inputId, btn) {
+  const el = document.getElementById(inputId);
+  if (!el) return;
+  if (el.type === 'password') { el.type = 'text'; btn.textContent = 'Hide'; }
+  else { el.type = 'password'; btn.textContent = 'Show'; }
 }
 function refreshAuthUI() {
   const u = currentUser();
@@ -180,13 +190,28 @@ async function submitAuth() {
   msg.textContent = 'Please wait…'; msg.className = 'auth-msg';
   try {
     if (authMode === 'signup') {
+      const confirm = (document.getElementById('authPassword2') || {}).value || '';
+      if (confirm !== password) { msg.textContent = 'Passwords do not match.'; msg.className = 'auth-msg err'; return; }
       const name = (document.getElementById('authName').value || '').trim() || email.split('@')[0];
-      const data = await api('/api/auth/signup', { method: 'POST', body: JSON.stringify({ email, password, name }) });
-      setToken(data.token); cachedUser = data.user; cachedBalance = Number(data.user.balance) || 0;
+      const payload = {
+        email, password, confirm_password: confirm, name,
+        country: (document.getElementById('authCountry') || {}).value || '',
+        phone: (document.getElementById('authPhone') || {}).value || '',
+        dob: (document.getElementById('authDob') || {}).value || '',
+        address: (document.getElementById('authAddress') || {}).value || '',
+        city: (document.getElementById('authCity') || {}).value || '',
+        postal_code: (document.getElementById('authPostal') || {}).value || ''
+      };
+      const data = await api('/api/auth/signup', { method: 'POST', body: JSON.stringify(payload) });
+      setToken(data.token);
+      cachedUser = data.user;
+      cachedBalance = Number(data.user.balance) || 0;
       msg.textContent = 'Account created.'; msg.className = 'auth-msg ok';
     } else {
       const data = await api('/api/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) });
-      setToken(data.token); cachedUser = data.user; cachedBalance = Number(data.user.balance) || 0;
+      setToken(data.token);
+      cachedUser = data.user;
+      cachedBalance = Number(data.user.balance) || 0;
       msg.textContent = 'Welcome back, ' + (data.user.name || email) + '.'; msg.className = 'auth-msg ok';
     }
     refreshAuthUI(); refreshWalletUI(); showPage('trade');
@@ -196,7 +221,7 @@ async function submitAuth() {
 }
 function logoutUser() {
   setToken(null); cachedUser = null; cachedBalance = 0;
-  refreshAuthUI(); refreshWalletUI(); showPage('auth');
+  refreshAuthUI(); refreshWalletUI(); showPage('home');
   const msg = document.getElementById('authMsg');
   if (msg) { msg.textContent = 'Logged out.'; msg.className = 'auth-msg'; }
 }
@@ -519,7 +544,7 @@ function clearProgress() {
   updateUI(); drawChart();
 }
 function renderCoinList() {
-  const list = document.getElementById('coinList'); list.innerHTML = '';
+  const list = document.getElementById('coinList'); if (!list) return; list.innerHTML = '';
   COINS.forEach(coin => {
     const item = document.createElement('div');
     item.className = 'coin-item' + (coin.id === currentCoin.id ? ' active' : '');
@@ -577,8 +602,8 @@ async function fetchMajorPrices() {
   } catch (e) {}
 }
 async function fetchLivePrice() { await Promise.all([fetchSwordcatPrice(), fetchMajorPrices()]); renderCoinList(); renderCoinRecord(); }
-document.getElementById('customPrice').addEventListener('input', () => { clearProgress(); });
-document.getElementById('amount').addEventListener('input', () => { clearProgress(); });
+if (document.getElementById('customPrice')) document.getElementById('customPrice').addEventListener('input', () => { clearProgress(); });
+if (document.getElementById('amount')) document.getElementById('amount').addEventListener('input', () => { clearProgress(); });
 renderCoinList(); updateUI(); drawChart();
 fetchLivePrice(); setInterval(fetchLivePrice, 45000);
 if (document.getElementById('depositAddress')) document.getElementById('depositAddress').value = SOLANA_DEPOSIT_ADDRESS;
@@ -598,5 +623,5 @@ if (document.getElementById('depositAddress')) document.getElementById('depositA
     }
   }
   refreshWalletUI();
-  showPage('auth');
+  showPage('home');
 })();
