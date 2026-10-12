@@ -25,7 +25,6 @@
     }
 
     function patchJs(js) {
-      // Robust canvas resize (blank-chart fix)
       var robustResize =
         'function resize() {\n' +
         '  if (!canvas || !canvas.parentElement) return;\n' +
@@ -52,7 +51,6 @@
         'let running'
       );
 
-      // Stack P&L: amount on first line, percent on second (no side-by-side stretch)
       js = js.split(
         "pnlEl.textContent = (pnl>=0?'+':'') + formatMoney(pnl) + ' · ' + (pnlPct>=0?'▲ ':'▼ ') + Math.abs(pnlPct).toFixed(2) + '%';"
       ).join(
@@ -68,7 +66,12 @@
     }
 
     function patchHtml(html) {
-      // Stack pos-stats column; keep P&L from stretching full width
+      // Remove Clear local note button from transaction history
+      html = html.replace(
+        /\s*<button class="btn-secondary" onclick="clearTxHistory\(\)" style="width:100%">Clear local note<\/button>\s*/g,
+        '\n'
+      );
+
       var extraCss =
         '.pos-stats{flex-direction:column!important;align-items:flex-start!important;gap:4px!important;}' +
         '.pos-pnl{display:block!important;text-align:left!important;line-height:1.35!important;' +
