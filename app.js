@@ -29,6 +29,7 @@ let tradeHistory = [];
 try { tradeHistory = JSON.parse(localStorage.getItem('mps_trade_history') || '[]'); } catch (e) { tradeHistory = []; }
 let lastPrediction = null;
 let plannedPath = null;
+let tradeSettled = false;
 const SOLANA_DEPOSIT_ADDRESS = '44vABSx14hrUmkAoV5PwxJeMrNwCHBzrn6RrYx5W4tg2';
 function formatPrice(p) {
   if (p >= 1000) return '$' + p.toLocaleString('en-US', { maximumFractionDigits: 2 });
@@ -138,10 +139,10 @@ function renderTxPage() {
   try { trades = JSON.parse(localStorage.getItem('mps_trade_history') || '[]'); } catch (e) {}
   const items = [];
   log.forEach(t => items.push({ at: t.at, kind: t.kind, label: t.label, amount: t.amount, meta: t.meta || '' }));
-  trades.forEach(t => items.push({
-    at: t.at, kind: 'trade', label: 'Trade ' + (t.coin || ''),
-    amount: t.pnl, meta: (t.mult ? t.mult.toFixed(2) + 'x' : '') + ' · size $' + t.amount
-  }));
+  trades.forEach(t => {
+    if (log.some(x => x.kind === 'trade' && x.at === t.at)) return;
+    items.push({ at: t.at, kind: 'trade', label: 'Trade ' + (t.coin || ''), amount: t.pnl, meta: (t.mult ? t.mult.toFixed(2) + 'x' : '') + ' · size $' + t.amount });
+  });
   items.sort((a, b) => (b.at || 0) - (a.at || 0));
   if (!items.length) { el.innerHTML = '<div class="empty-msg">No transactions yet.</div>'; return; }
   el.innerHTML = items.slice(0, 50).map(t => {
@@ -395,7 +396,22 @@ function renderTradeRecord() {
 }
 function recordTrade(finalPrice) {
   if (!tokens || !startPrice) return;
-  const posVal = tokens * finalPrice, pnl = posVal - tradeAmount, mult = startPrice > 0 ? finalPrice / startPrice : 1;
+  if (tradeSettled) return;
+  tradeSettled = true;
+  const posVal = tokens * finalPrice;
+  const pnl = posVal - tradeAmount;
+  const mult = startPrice > 0 ? finalPrice / startPrice : 1;
+  if (currentUser()) {
+    setBalance(getBalance() + posVal);
+    addTx({
+      kind: 'trade',
+      label: 'Trade ' + currentCoin.name + (pnl >= 0 ? ' (profit)' : ' (loss)'),
+      amount: pnl,
+      meta: mult.toFixed(2) + 'x · size $' + tradeAmount,
+      email: currentUser().email
+    });
+    refreshWalletUI();
+  }
   tradeHistory.unshift({ coin: currentCoin.name, emoji: currentCoin.emoji, amount: tradeAmount, startPrice, endPrice: finalPrice, mult, pnl, predicted: lastPrediction && lastPrediction.coinId === currentCoin.id ? lastPrediction.mult : null, at: Date.now() });
   if (tradeHistory.length > 50) tradeHistory = tradeHistory.slice(0, 50);
   try { localStorage.setItem('mps_trade_history', JSON.stringify(tradeHistory)); } catch(e) {}
@@ -478,8 +494,18 @@ function tickSim() {
 }
 function startSim() {
   if (running) return;
+  if (!currentUser()) { showPage('auth'); return; }
   tradeAmount = parseFloat(document.getElementById('amount').value) || 1000;
   if (tradeAmount < 1) tradeAmount = 1;
+  const bal = getBalance();
+  if (bal < tradeAmount) {
+    alert('Insufficient balance. You have ' + formatMoney(bal) + ' but need ' + formatMoney(tradeAmount) + '. Deposit or lower the trade amount.');
+    showPage('wallet');
+    return;
+  }
+  setBalance(bal - tradeAmount);
+  refreshWalletUI();
+  tradeSettled = false;
   const base = getBasePrice();
   if (!plannedPath || plannedPath.coinId !== currentCoin.id || Math.abs(plannedPath.base - base)/base > 0.02) {
     plannedPath = generatePath(base);
