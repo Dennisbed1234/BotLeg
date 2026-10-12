@@ -33,8 +33,11 @@
     }
     .nav-tab:hover { color: #ccc; background: rgba(255,255,255,0.04); }
     .nav-tab.active { color: #000; background: linear-gradient(135deg, #00c853, #00e676); }
-    .page { display: none; width: 100%; }
-    .page.active { display: flex; flex-direction: column; align-items: center; }
+    /* Only one page visible — beats .main { display:flex } */
+    .main.page { display: none !important; width: 100%; }
+    .main.page.active {
+      display: flex !important; flex-direction: column; align-items: center;
+    }
     .sidebar {
       width: 260px; background: #0d0d14; border-right: 1px solid var(--border);
       display: flex; flex-direction: column; flex-shrink: 0;
@@ -61,7 +64,7 @@
     .coin-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
     .coin-price-side { text-align: right; font-size: 12px; font-variant-numeric: tabular-nums; }
     .main {
-      flex: 1; display: flex; flex-direction: column; align-items: center;
+      flex: 1; flex-direction: column; align-items: center;
       padding: 16px 12px 12px; min-width: 0; position: relative;
     }
     .menu-btn {
