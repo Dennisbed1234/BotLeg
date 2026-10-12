@@ -51,6 +51,16 @@
         'let running'
       );
 
+      // More room on the right so the mcap bubble is never clipped
+      js = js.split('padR=88').join('padR=108');
+
+      // Clamp bubble so its right edge stays inside the canvas
+      js = js.split(
+        'const bubbleX=last.x+12; let bubbleY=last.y-bh/2;'
+      ).join(
+        'let bubbleX=last.x+10; if(bubbleX+bw>W-6) bubbleX=Math.max(padL, W-6-bw); let bubbleY=last.y-bh/2;'
+      );
+
       js = js.split(
         "pnlEl.textContent = (pnl>=0?'+':'') + formatMoney(pnl) + ' · ' + (pnlPct>=0?'▲ ':'▼ ') + Math.abs(pnlPct).toFixed(2) + '%';"
       ).join(
@@ -71,7 +81,6 @@
         '\n'
       );
 
-      // Stack P&L vertically but keep it on the RIGHT (as before)
       var extraCss =
         '.pos-stats{display:flex!important;flex-direction:row!important;' +
         'justify-content:space-between!important;align-items:flex-end!important;gap:8px!important;}' +
