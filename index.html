@@ -13,29 +13,46 @@
 <body>
   <div class="boot">Loading <span>TradeClaw</span>…</div>
   <script>
-    (function () {
-      var COMMIT = '13c5b729030c7b93f124e13d1604ec45afb5ea2a';
-      var url = 'https://cdn.jsdelivr.net/gh/Dennisbed1234/TradeClaw@' + COMMIT + '/index.html';
-      fetch(url)
-        .then(function (r) {
-          if (!r.ok) throw new Error('Failed to load app shell');
-          return r.text();
-        })
-        .then(function (html) {
-          html = html.split('Meme Pump').join('TradeClaw');
-          html = html.split('Meme Coins').join('Markets');
-          // Keep local app.js (same origin) so /api/* still hits Vercel
-          document.open();
-          document.write(html);
-          document.close();
-        })
-        .catch(function (e) {
-          document.body.innerHTML =
-            '<div class="boot" style="color:#ff5252">Could not restore app.<br>' +
-            (e.message || e) +
-            '<br><br>On GitHub, restore index.html and app.js from commit 13c5b729.</div>';
-        });
-    })();
+  (async function () {
+    var COMMIT = '13c5b729030c7b93f124e13d1604ec45afb5ea2a';
+    var base = 'https://cdn.jsdelivr.net/gh/Dennisbed1234/TradeClaw@' + COMMIT + '/';
+    try {
+      var html = await (await fetch(base + 'index.html')).text();
+      html = html.split('Meme Pump').join('TradeClaw');
+      html = html.split('Meme Coins').join('Markets');
+      var parser = new DOMParser();
+      var doc = parser.parseFromString(html, 'text/html');
+
+      // Copy styles from head
+      document.head.innerHTML = '';
+      var title = document.createElement('title');
+      title.textContent = 'TradeClaw — AI Meme Trading';
+      document.head.appendChild(title);
+      var meta = document.createElement('meta');
+      meta.name = 'viewport';
+      meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
+      document.head.appendChild(meta);
+      doc.head.querySelectorAll('style').forEach(function (s) {
+        document.head.appendChild(s.cloneNode(true));
+      });
+
+      // Body content (without scripts)
+      document.body.innerHTML = doc.body.innerHTML;
+
+      // Load app logic from same-origin app.js (which loads full code)
+      var script = document.createElement('script');
+      script.src = 'app.js';
+      script.onerror = function () {
+        document.body.insertAdjacentHTML('afterbegin',
+          '<div style="color:#ff5252;padding:20px;text-align:center">Failed to load app.js</div>');
+      };
+      document.body.appendChild(script);
+    } catch (e) {
+      document.body.innerHTML =
+        '<div class="boot" style="color:#ff5252">Restore failed: ' + (e.message || e) +
+        '<br><br>Please restore index.html and app.js from GitHub commit 13c5b729</div>';
+    }
+  })();
   </script>
 </body>
 </html>
