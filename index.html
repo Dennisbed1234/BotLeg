@@ -3,7 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>BotLeg — AI Meme Trading</title>
+  <title>BotLeg</title>
+  <meta name="application-name" content="BotLeg" />
+  <meta name="apple-mobile-web-app-title" content="BotLeg" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#00e676" />
+  <meta name="description" content="BotLeg — AI-powered meme coin trading" />
+  <link rel="manifest" href="/public/manifest.webmanifest" />
+  <link rel="icon" href="/public/favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="/public/icon-192.svg" />
   <style>
     body { margin: 0; background: #0a0a0f; color: #888; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
     #boot { text-align: center; margin-top: 40vh; font-size: 15px; }
@@ -19,8 +29,10 @@
 
     function brand(s) {
       return String(s)
-        .split('Meme Pump — AI Trading Bot').join('BotLeg — AI Meme Trading')
-        .split('TradeClaw — AI Meme Trading').join('BotLeg — AI Meme Trading')
+        .split('Meme Pump — AI Trading Bot').join('BotLeg')
+        .split('TradeClaw — AI Meme Trading').join('BotLeg')
+        .split('BotLeg — AI Meme Trading').join('BotLeg')
+        .split('AI Meme Trading').join('BotLeg')
         .split('Meme Pump').join('BotLeg')
         .split('TradeClaw').join('BotLeg')
         .split('Meme Coins').join('Markets');
@@ -194,6 +206,25 @@
     }
 
     function patchHtml(html) {
+      // PWA / home-screen name + icons (iPhone & Android)
+      html = html.replace(/<title>[^<]*<\/title>/i, '<title>BotLeg</title>');
+      var pwaTags =
+        '<meta name="application-name" content="BotLeg" />' +
+        '<meta name="apple-mobile-web-app-title" content="BotLeg" />' +
+        '<meta name="apple-mobile-web-app-capable" content="yes" />' +
+        '<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />' +
+        '<meta name="mobile-web-app-capable" content="yes" />' +
+        '<meta name="theme-color" content="#00e676" />' +
+        '<link rel="manifest" href="/public/manifest.webmanifest" />' +
+        '<link rel="icon" href="/public/favicon.svg" type="image/svg+xml" />' +
+        '<link rel="apple-touch-icon" href="/public/icon-192.svg" />';
+      if (html.indexOf('apple-mobile-web-app-title') === -1) {
+        if (html.indexOf('</head>') !== -1) {
+          html = html.replace('</head>', pwaTags + '</head>');
+        } else if (html.indexOf('<head>') !== -1) {
+          html = html.replace('<head>', '<head>' + pwaTags);
+        }
+      }
       // Replace side-by-side country+phone row with stacked full-width fields + helper text
       var stacked =
         '<div class="form-group">' +
@@ -213,7 +244,6 @@
         stacked
       );
 
-      // Fallback if structure differs slightly: still swap input → select
       html = html.replace(
         /<input type="text" id="authCountry"[^>]*>/,
         '<select id="authCountry" class="select-input" autocomplete="country-name">' +
