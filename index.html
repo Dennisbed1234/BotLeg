@@ -194,21 +194,37 @@
     }
 
     function patchHtml(html) {
-      // Country text input → dropdown (US default)
+      // Replace side-by-side country+phone row with stacked full-width fields + helper text
+      var stacked =
+        '<div class="form-group">' +
+          '<label>Country</label>' +
+          '<p class="field-hint">Please select your country from the dropdown list below.</p>' +
+          '<select id="authCountry" class="select-input" autocomplete="country-name">' +
+            COUNTRY_OPTIONS +
+          '</select>' +
+        '</div>' +
+        '<div class="form-group">' +
+          '<label>Phone (with country code)</label>' +
+          '<input type="tel" id="authPhone" placeholder="+1 555 123 4567" autocomplete="tel" />' +
+        '</div>';
+
+      html = html.replace(
+        /<div class="form-row">\s*<div class="form-group">\s*<label>Country<\/label>[\s\S]*?<label>Phone \(with country code\)<\/label>[\s\S]*?<\/div>\s*<\/div>/,
+        stacked
+      );
+
+      // Fallback if structure differs slightly: still swap input → select
       html = html.replace(
         /<input type="text" id="authCountry"[^>]*>/,
         '<select id="authCountry" class="select-input" autocomplete="country-name">' +
           COUNTRY_OPTIONS +
         '</select>'
       );
-
-      // US phone example instead of Nigeria
       html = html.replace(
         'placeholder="+234 801 234 5678"',
         'placeholder="+1 555 123 4567"'
       );
 
-      // Remove Clear local note
       html = html.replace(
         /\s*<button class="btn-secondary" onclick="clearTxHistory\(\)" style="width:100%">Clear local note<\/button>\s*/g,
         '\n'
@@ -225,7 +241,8 @@
         'border-radius:12px;color:#fff;font-size:14px;padding:12px 14px;outline:none;' +
         'font-family:inherit;-webkit-appearance:none;appearance:none;}' +
         'select.select-input:focus, #authCountry:focus{border-color:#00e676;}' +
-        'select.select-input option, #authCountry option{background:#1a1a24;color:#fff;}';
+        'select.select-input option, #authCountry option{background:#1a1a24;color:#fff;}' +
+        '.field-hint{font-size:11px;color:#888;margin:0 0 6px;line-height:1.35;}';
       if (html.indexOf('</style>') !== -1) {
         html = html.replace('</style>', extraCss + '</style>');
       }
