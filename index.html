@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>TradeClaw — AI Meme Trading</title>
+  <title>BotLeg — AI Meme Trading</title>
   <style>
     body { margin: 0; background: #0a0a0f; color: #888; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
     #boot { text-align: center; margin-top: 40vh; font-size: 15px; }
@@ -11,7 +11,7 @@
   </style>
 </head>
 <body>
-  <div id="boot">Loading <b>TradeClaw</b>…</div>
+  <div id="boot">Loading <b>BotLeg</b>…</div>
   <script>
   (function () {
     var COMMIT = '13c5b729030c7b93f124e13d1604ec45afb5ea2a';
@@ -19,10 +19,131 @@
 
     function brand(s) {
       return String(s)
-        .split('Meme Pump — AI Trading Bot').join('TradeClaw — AI Meme Trading')
-        .split('Meme Pump').join('TradeClaw')
+        .split('Meme Pump — AI Trading Bot').join('BotLeg — AI Meme Trading')
+        .split('TradeClaw — AI Meme Trading').join('BotLeg — AI Meme Trading')
+        .split('Meme Pump').join('BotLeg')
+        .split('TradeClaw').join('BotLeg')
         .split('Meme Coins').join('Markets');
     }
+
+    var COUNTRY_OPTIONS =
+      '<option value="">Select country</option>' +
+      '<optgroup label="North America">' +
+      '<option value="United States" selected>🇺🇸 United States</option>' +
+      '<option value="Canada">🇨🇦 Canada</option>' +
+      '<option value="Mexico">🇲🇽 Mexico</option>' +
+      '<option value="Guatemala">🇬🇹 Guatemala</option>' +
+      '<option value="Honduras">🇭🇳 Honduras</option>' +
+      '<option value="El Salvador">🇸🇻 El Salvador</option>' +
+      '<option value="Costa Rica">🇨🇷 Costa Rica</option>' +
+      '<option value="Panama">🇵🇦 Panama</option>' +
+      '<option value="Cuba">🇨🇺 Cuba</option>' +
+      '<option value="Dominican Republic">🇩🇴 Dominican Republic</option>' +
+      '<option value="Jamaica">🇯🇲 Jamaica</option>' +
+      '<option value="Haiti">🇭🇹 Haiti</option>' +
+      '<option value="Trinidad and Tobago">🇹🇹 Trinidad and Tobago</option>' +
+      '</optgroup>' +
+      '<optgroup label="South America">' +
+      '<option value="Brazil">🇧🇷 Brazil</option>' +
+      '<option value="Argentina">🇦🇷 Argentina</option>' +
+      '<option value="Colombia">🇨🇴 Colombia</option>' +
+      '<option value="Chile">🇨🇱 Chile</option>' +
+      '<option value="Peru">🇵🇪 Peru</option>' +
+      '<option value="Venezuela">🇻🇪 Venezuela</option>' +
+      '<option value="Ecuador">🇪🇨 Ecuador</option>' +
+      '<option value="Bolivia">🇧🇴 Bolivia</option>' +
+      '<option value="Paraguay">🇵🇾 Paraguay</option>' +
+      '<option value="Uruguay">🇺🇾 Uruguay</option>' +
+      '<option value="Guyana">🇬🇾 Guyana</option>' +
+      '<option value="Suriname">🇸🇷 Suriname</option>' +
+      '</optgroup>' +
+      '<optgroup label="Europe">' +
+      '<option value="United Kingdom">🇬🇧 United Kingdom</option>' +
+      '<option value="Ireland">🇮🇪 Ireland</option>' +
+      '<option value="France">🇫🇷 France</option>' +
+      '<option value="Germany">🇩🇪 Germany</option>' +
+      '<option value="Spain">🇪🇸 Spain</option>' +
+      '<option value="Portugal">🇵🇹 Portugal</option>' +
+      '<option value="Italy">🇮🇹 Italy</option>' +
+      '<option value="Netherlands">🇳🇱 Netherlands</option>' +
+      '<option value="Belgium">🇧🇪 Belgium</option>' +
+      '<option value="Luxembourg">🇱🇺 Luxembourg</option>' +
+      '<option value="Switzerland">🇨🇭 Switzerland</option>' +
+      '<option value="Austria">🇦🇹 Austria</option>' +
+      '<option value="Sweden">🇸🇪 Sweden</option>' +
+      '<option value="Norway">🇳🇴 Norway</option>' +
+      '<option value="Denmark">🇩🇰 Denmark</option>' +
+      '<option value="Finland">🇫🇮 Finland</option>' +
+      '<option value="Iceland">🇮🇸 Iceland</option>' +
+      '<option value="Poland">🇵🇱 Poland</option>' +
+      '<option value="Czech Republic">🇨🇿 Czech Republic</option>' +
+      '<option value="Slovakia">🇸🇰 Slovakia</option>' +
+      '<option value="Hungary">🇭🇺 Hungary</option>' +
+      '<option value="Romania">🇷🇴 Romania</option>' +
+      '<option value="Bulgaria">🇧🇬 Bulgaria</option>' +
+      '<option value="Greece">🇬🇷 Greece</option>' +
+      '<option value="Croatia">🇭🇷 Croatia</option>' +
+      '<option value="Slovenia">🇸🇮 Slovenia</option>' +
+      '<option value="Serbia">🇷🇸 Serbia</option>' +
+      '<option value="Bosnia and Herzegovina">🇧🇦 Bosnia and Herzegovina</option>' +
+      '<option value="North Macedonia">🇲🇰 North Macedonia</option>' +
+      '<option value="Albania">🇦🇱 Albania</option>' +
+      '<option value="Montenegro">🇲🇪 Montenegro</option>' +
+      '<option value="Kosovo">🇽🇰 Kosovo</option>' +
+      '<option value="Ukraine">🇺🇦 Ukraine</option>' +
+      '<option value="Moldova">🇲🇩 Moldova</option>' +
+      '<option value="Belarus">🇧🇾 Belarus</option>' +
+      '<option value="Lithuania">🇱🇹 Lithuania</option>' +
+      '<option value="Latvia">🇱🇻 Latvia</option>' +
+      '<option value="Estonia">🇪🇪 Estonia</option>' +
+      '<option value="Malta">🇲🇹 Malta</option>' +
+      '<option value="Cyprus">🇨🇾 Cyprus</option>' +
+      '<option value="Russia">🇷🇺 Russia</option>' +
+      '</optgroup>' +
+      '<optgroup label="Asia">' +
+      '<option value="China">🇨🇳 China</option>' +
+      '<option value="Japan">🇯🇵 Japan</option>' +
+      '<option value="South Korea">🇰🇷 South Korea</option>' +
+      '<option value="India">🇮🇳 India</option>' +
+      '<option value="Indonesia">🇮🇩 Indonesia</option>' +
+      '<option value="Vietnam">🇻🇳 Vietnam</option>' +
+      '<option value="Thailand">🇹🇭 Thailand</option>' +
+      '<option value="Philippines">🇵🇭 Philippines</option>' +
+      '<option value="Malaysia">🇲🇾 Malaysia</option>' +
+      '<option value="Singapore">🇸🇬 Singapore</option>' +
+      '<option value="Taiwan">🇹🇼 Taiwan</option>' +
+      '<option value="Hong Kong">🇭🇰 Hong Kong</option>' +
+      '<option value="Pakistan">🇵🇰 Pakistan</option>' +
+      '<option value="Bangladesh">🇧🇩 Bangladesh</option>' +
+      '<option value="Saudi Arabia">🇸🇦 Saudi Arabia</option>' +
+      '<option value="United Arab Emirates">🇦🇪 United Arab Emirates</option>' +
+      '<option value="Qatar">🇶🇦 Qatar</option>' +
+      '<option value="Israel">🇮🇱 Israel</option>' +
+      '<option value="Turkey">🇹🇷 Turkey</option>' +
+      '<option value="Kazakhstan">🇰🇿 Kazakhstan</option>' +
+      '</optgroup>' +
+      '<optgroup label="Africa">' +
+      '<option value="Nigeria">🇳🇬 Nigeria</option>' +
+      '<option value="South Africa">🇿🇦 South Africa</option>' +
+      '<option value="Egypt">🇪🇬 Egypt</option>' +
+      '<option value="Kenya">🇰🇪 Kenya</option>' +
+      '<option value="Ghana">🇬🇭 Ghana</option>' +
+      '<option value="Ethiopia">🇪🇹 Ethiopia</option>' +
+      '<option value="Morocco">🇲🇦 Morocco</option>' +
+      '<option value="Algeria">🇩🇿 Algeria</option>' +
+      '<option value="Tunisia">🇹🇳 Tunisia</option>' +
+      '<option value="Tanzania">🇹🇿 Tanzania</option>' +
+      '<option value="Uganda">🇺🇬 Uganda</option>' +
+      '<option value="Rwanda">🇷🇼 Rwanda</option>' +
+      '<option value="Senegal">🇸🇳 Senegal</option>' +
+      '<option value="Ivory Coast">🇨🇮 Ivory Coast</option>' +
+      '<option value="Cameroon">🇨🇲 Cameroon</option>' +
+      '<option value="Angola">🇦🇴 Angola</option>' +
+      '<option value="Mozambique">🇲🇿 Mozambique</option>' +
+      '<option value="Zambia">🇿🇲 Zambia</option>' +
+      '<option value="Zimbabwe">🇿🇼 Zimbabwe</option>' +
+      '<option value="Democratic Republic of the Congo">🇨🇩 DR Congo</option>' +
+      '</optgroup>';
 
     function patchJs(js) {
       var robustResize =
@@ -51,10 +172,7 @@
         'let running'
       );
 
-      // Balance: line ends further right, bubble stays fully visible (~4px margin)
       js = js.split('padR=88').join('padR=96');
-
-      // Place bubble just after the tip; clamp only if it would clip
       js = js.split(
         'const bubbleX=last.x+12; let bubbleY=last.y-bh/2;'
       ).join(
@@ -76,6 +194,21 @@
     }
 
     function patchHtml(html) {
+      // Country text input → dropdown (US default)
+      html = html.replace(
+        /<input type="text" id="authCountry"[^>]*>/,
+        '<select id="authCountry" class="select-input" autocomplete="country-name">' +
+          COUNTRY_OPTIONS +
+        '</select>'
+      );
+
+      // US phone example instead of Nigeria
+      html = html.replace(
+        'placeholder="+234 801 234 5678"',
+        'placeholder="+1 555 123 4567"'
+      );
+
+      // Remove Clear local note
       html = html.replace(
         /\s*<button class="btn-secondary" onclick="clearTxHistory\(\)" style="width:100%">Clear local note<\/button>\s*/g,
         '\n'
@@ -87,7 +220,12 @@
         '.pos-tokens{flex:1!important;min-width:0!important;word-break:break-word!important;}' +
         '.pos-pnl{display:block!important;text-align:right!important;line-height:1.35!important;' +
         'font-size:13px!important;flex:none!important;max-width:55%!important;' +
-        'word-break:break-word!important;margin-left:auto!important;}';
+        'word-break:break-word!important;margin-left:auto!important;}' +
+        'select.select-input, #authCountry{width:100%;background:#1a1a24;border:1px solid #2a2a3a;' +
+        'border-radius:12px;color:#fff;font-size:14px;padding:12px 14px;outline:none;' +
+        'font-family:inherit;-webkit-appearance:none;appearance:none;}' +
+        'select.select-input:focus, #authCountry:focus{border-color:#00e676;}' +
+        'select.select-input option, #authCountry option{background:#1a1a24;color:#fff;}';
       if (html.indexOf('</style>') !== -1) {
         html = html.replace('</style>', extraCss + '</style>');
       }
@@ -137,7 +275,7 @@
         var el = document.getElementById('boot');
         if (el) {
           el.innerHTML =
-            '<span style="color:#ff5252">Could not load TradeClaw.</span><br><br>' +
+            '<span style="color:#ff5252">Could not load BotLeg.</span><br><br>' +
             (e.message || e);
         }
       });
