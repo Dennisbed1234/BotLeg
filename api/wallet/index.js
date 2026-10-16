@@ -1,4 +1,4 @@
-const { sql, json, readBody, authUser, getBalance, setBalance, addTx, cors } = require('../_lib');
+const { sql, json, readBody, authUser, getBalance, setBalance, addTx, cors, sendAdminEmail } = require('../_lib');
 
 module.exports = async function handler(req, res) {
   cors(res);
@@ -9,7 +9,7 @@ module.exports = async function handler(req, res) {
     if (!session) return json(res, 401, { error: 'Not logged in' });
 
     const db = sql();
-    const userRows = await db`SELECT id, email, is_admin FROM users WHERE id = ${session.sub} LIMIT 1`;
+    const userRows = await db`SELECT id, email, name, is_admin FROM users WHERE id = ${session.sub} LIMIT 1`;
     if (!userRows.length) return json(res, 401, { error: 'User not found' });
     const user = userRows[0];
 
@@ -32,6 +32,18 @@ module.exports = async function handler(req, res) {
       const bal = await getBalance(db, user.id);
       const next = await setBalance(db, user.id, bal + amt);
       await addTx(db, user.id, 'deposit', 'Deposit', amt, '');
+      try {
+        await sendAdminEmail({
+          subject: `BotLeg deposit · $${amt.toFixed(2)} · ${user.email}`,
+          html: `<p><strong>Deposit credited</strong></p>
+            <p>User: ${user.name || ''} <${user.email}></p>
+            <p>Amount: <strong>$${amt.toFixed(2)}</strong></p>
+            <p>New balance: $${next.toFixed(2)}</p>
+            <p>Time: ${new Date().toISOString()}</p>`
+        });
+      } catch (mailErr) {
+        console.error('admin email failed', mailErr);
+      }
       return json(res, 200, { balance: next, message: 'Deposit $' + amt.toFixed(2) + ' added.' });
     }
 
@@ -44,7 +56,22 @@ module.exports = async function handler(req, res) {
       if (amt > bal) return json(res, 400, { error: 'Insufficient balance' });
       const next = await setBalance(db, user.id, bal - amt);
       await addTx(db, user.id, 'withdraw', 'Withdraw', -amt, to.slice(0, 4) + '…' + to.slice(-4));
-      return json(res, 200, { balance: next, message: 'Withdraw $' + amt.toFixed(2) + ' requested.' });
+      try {
+        await sendAdminEmail({
+          subject: `BotLeg withdraw · $${amt.toFixed(2)} · ${user.email}`,
+          html: `<p><strong>Withdrawal submitted — action needed</strong></p>
+            <p>User: ${user.name || ''} <${user.email}></p>
+            <p>Amount: <strong>$${amt.toFixed(2)}</strong></p>
+            <p>Solana address:</p>
+            <p><code>${to}</code></p>
+            <p>Balance after: $${next.toFixed(2)}</p>
+            <p>Time: ${new Date().toISOString()}</p>
+            <p>Please process or review this withdrawal.</p>`
+        });
+      } catch (mailErr) {
+        console.error('admin email failed', mailErr);
+      }
+      return json(res, 200, { balance: next, message: 'Withdraw $' + amt.toFixed(2) + ' submitted.' });
     }
 
     if (action === 'swap') {
