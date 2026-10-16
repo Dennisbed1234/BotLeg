@@ -111,7 +111,36 @@ async function addTx(db, userId, kind, label, amountUsd, meta = '') {
   `;
 }
 
+async function sendAdminEmail({ subject, html }) {
+  const key = process.env.RESEND_API_KEY;
+  if (!key) {
+    console.warn('RESEND_API_KEY not set — skipping admin email');
+    return { skipped: true };
+  }
+  const from = process.env.RESEND_FROM || 'BotLeg <onboarding@resend.dev>';
+  let to = process.env.ADMIN_NOTIFY_EMAIL;
+  if (to) {
+    to = to.split(',').map((s) => s.trim()).filter(Boolean);
+  } else {
+    to = ADMINS.map((a) => a.email);
+  }
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      Authorization: 'Bearer ' + key,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ from, to, subject, html })
+  });
+  if (!res.ok) {
+    const t = await res.text().catch(() => '');
+    console.error('Resend error', res.status, t);
+    throw new Error('Email failed');
+  }
+  return res.json().catch(() => ({ ok: true }));
+}
+
 module.exports = {
   sql, cors, json, readBody, signToken, authUser, ensureAdmins,
-  getBalance, setBalance, addTx, bcrypt, ADMINS
+  getBalance, setBalance, addTx, bcrypt, ADMINS, sendAdminEmail
 };
