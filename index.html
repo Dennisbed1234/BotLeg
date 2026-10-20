@@ -202,7 +202,6 @@
         "pnlEl.innerHTML = '+$0.00<br>▲ 0.00%';"
       );
 
-      // Auto-clear wallet success messages so green text does not stick
       if (js.indexOf('function flashWalletMsg') === -1) {
         js = js.replace(
           'function copyDepositAddress()',
@@ -279,11 +278,31 @@
 
       html = html.split('Request withdraw').join('Withdraw');
 
-      // Footer contact email
+      var FOOTER_HTML =
+        '<div class="footer site-footer">' +
+          '© 2026 BotLeg · ' +
+          '<a href="mailto:info@botleg.online">info@botleg.online</a>' +
+        '</div>';
+
+      html = html.replace(/<div class="footer">[\s\S]*?<\/div>/g, FOOTER_HTML);
+
+      // Footer on home (default screen)
       html = html.replace(
-        /<div class="footer">[\s\S]*?<\/div>/,
-        '<div class="footer">© 2026 BotLeg · <a href="mailto:info@botleg.online" style="color:#00e676;text-decoration:none;">info@botleg.online</a></div>'
+        /(id="pageHome"[\s\S]*?<\/div>\s*<\/div>\s*)(<div class="main page" id="pageTrade")/,
+        function (m, a, b) {
+          if (a.indexOf('info@botleg.online') !== -1) return m;
+          return a + FOOTER_HTML + '\n  ' + b;
+        }
       );
+
+      if (html.indexOf('id="botlegSiteFooter"') === -1) {
+        html = html.replace(
+          '</body>',
+          '<div id="botlegSiteFooter" class="footer site-footer">' +
+            '© 2026 BotLeg · <a href="mailto:info@botleg.online">info@botleg.online</a>' +
+          '</div></body>'
+        );
+      }
 
       var extraCss =
         '.pos-stats{display:flex!important;flex-direction:row!important;' +
@@ -298,7 +317,13 @@
         'select.select-input:focus, #authCountry:focus{border-color:#00e676;}' +
         'select.select-input option, #authCountry option{background:#1a1a24;color:#fff;}' +
         '.field-hint{font-size:11px;color:#888;margin:0 0 6px;line-height:1.35;}' +
-        '.footer a{color:#00e676;text-decoration:none;}.footer a:hover{text-decoration:underline;}';
+        '.footer,.site-footer{display:block!important;visibility:visible!important;' +
+        'text-align:center!important;font-size:12px!important;color:#9aa3ad!important;' +
+        'margin:16px auto 28px!important;padding:14px 12px!important;max-width:420px!important;' +
+        'line-height:1.5!important;border-top:1px solid #1e2430!important;}' +
+        '.footer a,.site-footer a{color:#00e676!important;text-decoration:none!important;font-weight:600!important;}' +
+        '.footer a:hover,.site-footer a:hover{text-decoration:underline!important;}' +
+        '#botlegSiteFooter{position:relative;z-index:5;width:100%;box-sizing:border-box;}';
       if (html.indexOf('</style>') !== -1) {
         html = html.replace('</style>', extraCss + '</style>');
       }
