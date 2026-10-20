@@ -278,12 +278,23 @@
 
       html = html.split('Request withdraw').join('Withdraw');
 
-      // Only change the existing footer text — no extra nodes, layout unchanged
-      html = html.split(
-        '<div class="footer">Live prices · Set your start price · Trade</div>'
-      ).join(
-        '<div class="footer">© 2026 BotLeg · <a href="mailto:info@botleg.online">info@botleg.online</a></div>'
-      );
+      // Contact email only at bottom of Home (after Open AI Bot / Start trading)
+      var homeFooter =
+        '<div class="footer" style="margin-top:20px;padding-bottom:8px">' +
+        '© 2026 BotLeg · <a href="mailto:info@botleg.online" style="color:#00e676;text-decoration:none;font-weight:600">info@botleg.online</a>' +
+        '</div>';
+
+      if (html.indexOf('info@botleg.online') === -1) {
+        html = html.replace(
+          "<button class=\"btn-secondary\" onclick=\"showPage('trade')\">Start trading</button>\n        </div>\n      </div>\n    </div>\n  </div>\n  <div class=\"main page\" id=\"pageTrade\">",
+          "<button class=\"btn-secondary\" onclick=\"showPage('trade')\">Start trading</button>\n        </div>\n" +
+          homeFooter +
+          "\n      </div>\n    </div>\n  </div>\n  <div class=\"main page\" id=\"pageTrade\">"
+        );
+      }
+
+      // Keep Trade page footer as original short line (no email there)
+      // (do not rewrite the trade footer)
 
       var extraCss =
         '.pos-stats{display:flex!important;flex-direction:row!important;' +
@@ -297,9 +308,7 @@
         'font-family:inherit;-webkit-appearance:none;appearance:none;}' +
         'select.select-input:focus, #authCountry:focus{border-color:#00e676;}' +
         'select.select-input option, #authCountry option{background:#1a1a24;color:#fff;}' +
-        '.field-hint{font-size:11px;color:#888;margin:0 0 6px;line-height:1.35;}' +
-        '.footer a{color:#00e676;text-decoration:none;font-weight:600;}' +
-        '.footer a:hover{text-decoration:underline;}';
+        '.field-hint{font-size:11px;color:#888;margin:0 0 6px;line-height:1.35;}';
       if (html.indexOf('</style>') !== -1) {
         html = html.replace('</style>', extraCss + '</style>');
       }
