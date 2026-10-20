@@ -278,20 +278,12 @@
 
       html = html.split('Request withdraw').join('Withdraw');
 
-      // ONLY update the existing footer text — do not inject extra nodes or break layout
+      // Only change the existing footer text — no extra nodes, layout unchanged
       html = html.split(
         '<div class="footer">Live prices · Set your start price · Trade</div>'
       ).join(
         '<div class="footer">© 2026 BotLeg · <a href="mailto:info@botleg.online">info@botleg.online</a></div>'
       );
-
-      // Add the same line at the bottom of the Home screen only (safe unique anchor)
-      if (html.indexOf('data-botleg-home-footer') === -1) {
-        html = html.replace(
-          '<div class="main page" id="pageTrade">',
-          '<div class="footer" data-botleg-home-footer="1">© 2026 BotLeg · <a href="mailto:info@botleg.online">info@botleg.online</a></div>\n  <div class="main page" id="pageTrade">'
-        );
-      }
 
       var extraCss =
         '.pos-stats{display:flex!important;flex-direction:row!important;' +
@@ -306,7 +298,6 @@
         'select.select-input:focus, #authCountry:focus{border-color:#00e676;}' +
         'select.select-input option, #authCountry option{background:#1a1a24;color:#fff;}' +
         '.field-hint{font-size:11px;color:#888;margin:0 0 6px;line-height:1.35;}' +
-        '.footer{text-align:center;font-size:12px;color:#888;margin:16px auto 20px;padding:12px 8px;max-width:380px;line-height:1.4;}' +
         '.footer a{color:#00e676;text-decoration:none;font-weight:600;}' +
         '.footer a:hover{text-decoration:underline;}';
       if (html.indexOf('</style>') !== -1) {
